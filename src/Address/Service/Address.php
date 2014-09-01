@@ -51,7 +51,13 @@ class Address extends AbstractService
             if ($resAddress->count() > 0) {
                 $id = $resAddress->current()->getId();
             } else {
-                $result = $this->getServiceGeoloc()->getGeoloc(((!empty($datas['street_type']))?$datas['street_type'] . " ":"") . ((!empty($datas['street_name']))?$datas['street_name'] . " ":"") . ((!empty($datas['street_no']))?$datas['street_no'] . " ":"") . $city_name . $state_name . ((!empty($country_name))? " ," . $country_name:""));
+            	$result = $this->getServiceGeoloc()->getGeoloc(
+            			((!empty($datas['street_no']))?$datas['street_no'] . " ":"") .
+            			((!empty($datas['street_type']))?$datas['street_type'] . " ":"") . 
+            			((!empty($datas['street_name']))?$datas['street_name'] . " ":"") . 
+            			$city_name . " " .
+            			$state_name . 
+            			((!empty($country_name))? " ," . $country_name:""));
                 $result = $result['results'][0]['geometry']['location'];
                 
                 $tmz = $this->getServiceGeoloc()->getTimezone($result['lat'], $result['lng']);

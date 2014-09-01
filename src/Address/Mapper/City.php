@@ -41,7 +41,7 @@ class City extends AbstractMapper
     public function getCityId($city ,$division ,$country)
     {
         $select = $this->tableGateway->getSql()->select();
-        $select->columns(array('id'));
+        $select->columns(array('id' , 'name', 'libelle','code', 'longitude', 'latitude'));
         $select->where(array('city.name' =>  $city));
 
         if ($division && is_numeric($division)) {
