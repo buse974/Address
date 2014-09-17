@@ -2,6 +2,8 @@
 
 namespace Address\Mapper;
 
+use Dal\Mapper\AbstractMapper;
+
 class Address extends AbstractMapper
 {
     /**

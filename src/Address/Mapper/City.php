@@ -3,6 +3,8 @@
 namespace Address\Mapper;
 
 use Zend\Db\Sql\Predicate\Predicate;
+use Dal\Mapper\AbstractMapper;
+
 class City extends AbstractMapper
 {
     /**

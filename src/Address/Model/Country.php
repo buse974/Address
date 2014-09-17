@@ -2,6 +2,8 @@
 
 namespace Address\Model;
 
+use Dal\Model\AbstractModel;
+
 class Country extends AbstractModel
 {
     protected $id;

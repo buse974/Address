@@ -8,6 +8,18 @@ return array(
 						'adapter' => 'http-adapter',
 				),
 		),
+		'dal-conf' => array(
+				'adapter' => 'db-adapter',
+				'cache'   => 'storage_memcached',
+				'log'     => 'log-system',
+				'namespace' => array(
+						'addr' => array(
+								'service' => 'Address\\Service',
+								'mapper'  => 'Address\\Mapper',
+								'model'   => 'Address\\Model',
+						)
+				)
+		),
 		'service_manager' => array(
 				'invokables' => array(
 						'geoloc' => 'Address\Geoloc\Geoloc',

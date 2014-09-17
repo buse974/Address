@@ -3,6 +3,7 @@
 namespace Address\Mapper;
 
 use Zend\Db\Sql\Predicate\Predicate;
+use Dal\Mapper\AbstractMapper;
 
 class Country extends AbstractMapper
 {

@@ -3,6 +3,7 @@
 namespace Address\Service;
 
 use Address\Model\City as ModelCity;
+use Dal\Service\AbstractService;
 
 class City extends AbstractService
 {

@@ -3,6 +3,7 @@
 namespace Address\Service;
 
 use Address\Model\Division as ModelDivision;
+use Dal\Service\AbstractService;
 
 class Division extends AbstractService
 {

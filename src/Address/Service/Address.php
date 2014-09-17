@@ -4,6 +4,7 @@ namespace Address\Service;
 
 use Address\Model\Address as ModelAddress;
 use Zend\Db\Sql\Predicate\IsNull;
+use Dal\Service\AbstractService;
 
 class Address extends AbstractService
 {

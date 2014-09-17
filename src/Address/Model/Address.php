@@ -2,6 +2,8 @@
 
 namespace Address\Model;
 
+use Dal\Model\AbstractModel;
+
 class Address extends AbstractModel
 {
     protected $id;
