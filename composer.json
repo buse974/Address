@@ -16,5 +16,9 @@
 	},
 	"require-dev" : {
 		"phpunit/phpunit" : ">=3.7,<4"
-	}
+	},
+	"autoload": {
+        "psr-0": { "Address": "src/" }
+   },
+   "bin": ["bin/init-db.sh"]
 }
