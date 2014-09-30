@@ -1,7 +1,7 @@
 {
 	"name": "buse974/address",
 	"description": "Module Address for ZF2",
-	"type": "library",
+	"type": "module",
 	"homepage": "https://github.com/buse974/Address",
 	"license": "MIT",
 	"authors": [
