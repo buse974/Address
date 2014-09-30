@@ -12,7 +12,7 @@
 	],
 	"require": {
 		"php": ">=5.4",
-    	"buse974/dal":"dev-master"
+    	        "buse974/dal":"*"
 	},
 	"require-dev" : {
 		"phpunit/phpunit" : ">=3.7,<4"
