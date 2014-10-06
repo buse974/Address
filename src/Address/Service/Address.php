@@ -83,31 +83,43 @@ class Address extends AbstractService
      */
     public function get($address)
     {
-        $res = $this->getMapper()->get($address)->current();
-        
-        if(!is_double($res->getLatitude()) && !is_double($res->getLongitude())) {
-        	$res = $res->toArray();
-        	$results = $this->getServiceGeoloc()->getGeoloc(((!empty($res['street_type']))?$res['street_type'] . " ":"") . ((!empty($res['street_name']))?$res['street_name'] . " ":"") . ((!empty($res['street_no']))?$res['street_no'] . " ":"") . $res['city']['name'] . $res['division']['name'] . ((!empty($res['country']['name']))? " ," . $res['city']['name']:""));
-        	
-        	if($results['status'] === 'OK'){
-        		$result = $results['results'][0]['geometry']['location'];
-        		$tmz = $this->getServiceGeoloc()->getTimezone($result['lat'], $result['lng']);
-        		 
-        		$m_address = new ModelAddress();
-        		$m_address->setId($res['id'])
-		        		  ->setLatitude($result['lat'])
-		        		  ->setLongitude($result['lng'])
-		        		  ->setTimezone($tmz['timeZoneId']);
-        		 
-        		$res['latitude']  = $result['lat'];
-		        $res['longitude'] = $result['lng'];
-		        $res['timezone']  = $tmz['timeZoneId'];
-        		
-        		$this->getMapper()->update($m_address) . "\n\n";
-        	}
-        }
-        	
-        return $res;
+    	$res = $this->getMapper()->get($address);
+    
+    	if($res->count() <= 0) {
+    		return null;
+    	}
+    
+    	$res = $res->current()->toArray();
+    	if(!is_double($res['latitude']) && !is_double($res['longitude'])) {
+    		 
+    		$results = $this->getServiceGeoloc()->getGeoloc((
+    				(!empty($res['street_type']))?$res['street_type'] . " ":"") . 
+    				((!empty($res['street_name']))?$res['street_name'] . " ":"") . 
+    				((!empty($res['street_no']))?$res['street_no'] . " ":"") . 
+    				$res['city']['name'] . 
+    				$res['division']['name'] . 
+    				((!empty($res['country']['name']))? " ," . 
+    				$res['city']['name']:""));
+    		 
+    		if($results['status'] === 'OK'){
+    			$result = $results['results'][0]['geometry']['location'];
+    			$tmz = $this->getServiceGeoloc()->getTimezone($result['lat'], $result['lng']);
+    			 
+    			$m_address = new ModelAddress();
+    			$m_address->setId($res['id'])
+    			->setLatitude($result['lat'])
+    			->setLongitude($result['lng'])
+    			->setTimezone($tmz['timeZoneId']);
+    			 
+    			$res['latitude']  = $result['lat'];
+    			$res['longitude'] = $result['lng'];
+    			$res['timezone']  = $tmz['timeZoneId'];
+    
+    			$this->getMapper()->update($m_address) . "\n\n";
+    		}
+    	}
+    	 
+    	return $res;
     }
     
     public function initLngLat()
