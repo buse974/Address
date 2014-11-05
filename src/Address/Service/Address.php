@@ -5,6 +5,7 @@ namespace Address\Service;
 use Address\Model\Address as ModelAddress;
 use Zend\Db\Sql\Predicate\IsNull;
 use Dal\Service\AbstractService;
+use Address\Geoloc\Geoloc;
 
 class Address extends AbstractService
 {
@@ -78,81 +79,61 @@ class Address extends AbstractService
 
     /**
      *
-     * @param  number                 $address
-     * @return \Address\Model\Address
+     * @param  number	$address
+     * @return \Address\Model\Address\Relational
      */
     public function get($address)
     {
-    	$res = $this->getMapper()->get($address);
+    	$m_address = $this->getMapper()->get($address)->current();
     
-    	if($res->count() <= 0) {
-    		return null;
+    	if(!is_double($m_address->getLatitude()) && !is_double($m_address->getLongitude())) {
+    		$this->updateLngLatTmz($m_address);
     	}
     
-    	$res = $res->current()->toArray();
-    	if(!is_double($res['latitude']) && !is_double($res['longitude'])) {
-    		 
-    		$results = $this->getServiceGeoloc()->getGeoloc((
-    				(!empty($res['street_type']))?$res['street_type'] . " ":"") . 
-    				((!empty($res['street_name']))?$res['street_name'] . " ":"") . 
-    				((!empty($res['street_no']))?$res['street_no'] . " ":"") . 
-    				$res['city']['name'] . 
-    				$res['division']['name'] . 
-    				((!empty($res['country']['name']))? " ," . 
-    				$res['city']['name']:""));
-    		 
-    		if($results['status'] === 'OK'){
-    			$result = $results['results'][0]['geometry']['location'];
-    			$tmz = $this->getServiceGeoloc()->getTimezone($result['lat'], $result['lng']);
-    			 
-    			$m_address = new ModelAddress();
-    			$m_address->setId($res['id'])
-    			->setLatitude($result['lat'])
-    			->setLongitude($result['lng'])
-    			->setTimezone($tmz['timeZoneId']);
-    			 
-    			$res['latitude']  = $result['lat'];
-    			$res['longitude'] = $result['lng'];
-    			$res['timezone']  = $tmz['timeZoneId'];
-    
-    			$this->getMapper()->update($m_address) . "\n\n";
-    		}
-    	}
-    	 
-    	return $res;
+    	return $m_address;
     }
     
     public function initLngLat()
     {
     	$res_addr = $this->getMapper()->getList();
     	$ret = array();
-    	foreach ($res_addr as $addr){
-    		$datas = $addr->toArray();
-    		$results = $this->getServiceGeoloc()->getGeoloc(((!empty($datas['street_type']))?$datas['street_type'] . " ":"") . ((!empty($datas['street_name']))?$datas['street_name'] . " ":"") . ((!empty($datas['street_no']))?$datas['street_no'] . " ":"") . $datas['city']['name'] . $datas['division']['name'] . ((!empty($datas['country']['name']))? " ," . $datas['city']['name']:""));
-    		
-    		if($results['status'] === 'OK'){
-	    		$result = $results['results'][0]['geometry']['location'];
-	    		
-	    		$tmz = $this->getServiceGeoloc()->getTimezone($result['lat'], $result['lng']);
-	    		
-	    		$m_address = new ModelAddress();
-	    		$m_address->setId($datas['id'])
-			    		  ->setLatitude($result['lat'])
-			    		  ->setLongitude($result['lng'])
-			    		  ->setTimezone($tmz['timeZoneId']);
-	    		
-	    		 $this->getMapper()->update($m_address);
-    		}
-    		
-    		
-    		$ret[$datas['id']] = $results['status'];
+    	foreach ($res_addr as $m_address){
+    		$ret[$datas['id']] = $this->updateLngLatTmz($m_address);
     	}
     	
     	return $ret;
     }
 
+    public function updateLngLatTmz($m_address) 
+    {
+    	$ret = null;
+    	$addr_str = sprintf('%s %s %s %s %s %s',
+    			((!$m_address->getStreetNo() instanceof IsNull) ? $m_address->getStreetNo() : ''),
+    			((!$m_address->getStreetType() instanceof IsNull) ? $m_address->getStreetType() : ''),
+    			((!$m_address->getStreetName() instanceof IsNull) ? $m_address->getStreetName() : ''),
+    			((!$m_address->getCity()->getName() instanceof IsNull) ? $m_address->getCity()->getName() : ''),
+    			((!$m_address->getDivision()->getName() instanceof IsNull) ? $m_address->getDivision()->getName() : ''),
+    			((!$m_address->getCountry()->getName() instanceof IsNull) ? ','.$m_address->getCountry()->getName() : ''));
+    	
+    	$results = $this->getServiceGeoloc()->getGeoloc($addr_str);
+    	 
+    	if($results['status'] === Geoloc::STATUS_OK){
+    		$result = $results['results'][0]['geometry']['location'];
+    		$tmz = $this->getServiceGeoloc()->getTimezone($result['lat'], $result['lng']);
+    	
+    		$m_address->setLatitude($result['lat'])
+    		->setLongitude($result['lng'])
+    		->setTimezone($tmz['timeZoneId']);
+    	
+    		$this->getMapper()->update($m_address);
+    		
+    		$ret = $results['status'];
+    	}
+    	
+    	return $ret;
+    }
     /**
-     * @return \Dal\Service\Country
+     * @return \Address\Service\Country
      */
     public function getServiceCountry()
     {
@@ -160,7 +141,7 @@ class Address extends AbstractService
     }
 
     /**
-     * @return \Dal\Service\Division
+     * @return \Address\Service\Division
      */
     public function getServiceDivision()
     {
@@ -168,7 +149,7 @@ class Address extends AbstractService
     }
 
     /**
-     * @return \Dal\Service\City
+     * @return \Address\Service\City
      */
     public function getServiceCity()
     {
@@ -176,7 +157,7 @@ class Address extends AbstractService
     }
 
     /**
-     * @return \Dal\Geoloc\Geoloc
+     * @return \Address\Geoloc\Geoloc
      */
     public function getServiceGeoloc()
     {

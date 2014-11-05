@@ -6,6 +6,13 @@ use Zend\Http\Client;
 
 class Geoloc implements \Zend\ServiceManager\ServiceLocatorAwareInterface
 {
+	const STATUS_OK 				= 'OK';
+	const STATUS_ZERO_RESULTS 		= 'ZERO_RESULTS';
+	const STATUS_OVER_QUERY_LIMIT 	= 'OVER_QUERY_LIMIT';
+	const STATUS_REQUEST_DENIED 	= 'REQUEST_DENIED';
+	const STATUS_INVALID_REQUEST 	= 'INVALID_REQUEST';
+	const STATUS_UNKNOWN_ERROR 		= 'UNKNOWN_ERROR';
+	
     protected $serviceLocator;
     protected $api_location = 'geocode';
     protected $api_timezone = 'timezone';
