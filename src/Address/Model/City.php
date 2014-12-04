@@ -2,115 +2,47 @@
 
 namespace Address\Model;
 
-use Dal\Model\AbstractModel;
+use Address\Model\Country;
+use Address\Model\Division;
+use Address\Model\Base\City as BaseCity;
 
-class City extends AbstractModel
+class City extends BaseCity
 {
-    protected $id;
-    protected $name;
-    protected $libelle;
-    protected $code;
-    protected $division_id;
-    protected $country_id;
-    protected $latitude;
-    protected $longitude;
+    protected $division;
+    protected $country;
 
-    protected $prefix = 'city';
-
-    public function getId()
+    public function exchangeArray(array &$data)
     {
-        return $this->id;
+        parent::exchangeArray($data);
+
+        $this->country = new Country($this);
+        $this->division = new Division($this);
+
+        $this->country->exchangeArray($data);
+        $this->division->exchangeArray($data);
     }
 
-    public function setId($id)
+    public function getCountry()
     {
-        $this->id = $id;
+        return $this->country;
+    }
+
+    public function setCountry($country)
+    {
+        $this->country = $country;
 
         return $this;
     }
 
-    public function getName()
+    public function getDivision()
     {
-        return $this->name;
+        return $this->division;
     }
 
-    public function setName($name)
+    public function setDivision($division)
     {
-        $this->name = $name;
+        $this->division = $division;
 
         return $this;
     }
-
-    public function getLibelle()
-    {
-        return $this->libelle;
-    }
-
-    public function setLibelle($libelle)
-    {
-        $this->libelle = $libelle;
-
-        return $this;
-    }
-
-    public function getCode()
-    {
-        return $this->code;
-    }
-
-    public function setCode($code)
-    {
-        $this->code = $code;
-
-        return $this;
-    }
-
-    public function getDivisionId()
-    {
-        return $this->division_id;
-    }
-
-    public function setDivisionId($division_id)
-    {
-        $this->division_id = $division_id;
-
-        return $this;
-    }
-
-    public function getCountryId()
-    {
-        return $this->country_id;
-    }
-
-    public function setCountryId($country_id)
-    {
-        $this->country_id = $country_id;
-
-        return $this;
-    }
-
-    public function getLatitude()
-    {
-        return $this->latitude;
-    }
-
-    public function setLatitude($latitude)
-    {
-        $this->latitude = $latitude;
-
-        return $this;
-    }
-
-    public function getLongitude()
-    {
-        return $this->longitude;
-    }
-
-    public function setLongitude($longitude)
-    {
-        $this->longitude = $longitude;
-
-        return $this;
-    }
-
 }

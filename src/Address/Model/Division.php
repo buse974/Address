@@ -2,113 +2,30 @@
 
 namespace Address\Model;
 
-use Dal\Model\AbstractModel;
+use Address\Model\Country;
+use Address\Model\Base\Division as BaseDivision;
 
-class Division extends AbstractModel
+class Division extends BaseDivision
 {
-    protected $id;
-    protected $name;
-    protected $libelle;
-    protected $code;
-    protected $short_name;
-    protected $country_id;
-    protected $latitude;
-    protected $longitude;
+    protected $country;
 
-    protected $prefix = 'division';
-
-    public function getId()
+    public function exchangeArray(array &$data)
     {
-        return $this->id;
+        parent::exchangeArray($data);
+
+        $this->country = new Country($this);
+
+        $this->country->exchangeArray($data);
     }
 
-    public function setId($id)
+    public function getCountry()
     {
-        $this->id = $id;
-
-        return $this;
+        return $this->country;
     }
 
-    public function getName()
+    public function setCountry($country)
     {
-        return $this->name;
-    }
-
-    public function setName($name)
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    public function getLibelle()
-    {
-        return $this->libelle;
-    }
-
-    public function setLibelle($libelle)
-    {
-        $this->libelle = $libelle;
-
-        return $this;
-    }
-
-    public function getCode()
-    {
-        return $this->code;
-    }
-
-    public function setCode($code)
-    {
-        $this->code = $code;
-
-        return $this;
-    }
-
-    public function getShortName()
-    {
-        return $this->short_name;
-    }
-
-    public function setShortName($short_name)
-    {
-        $this->short_name = $short_name;
-
-        return $this;
-    }
-
-    public function getCountryId()
-    {
-        return $this->country_id;
-    }
-
-    public function setCountryId($country_id)
-    {
-        $this->country_id = $country_id;
-
-        return $this;
-    }
-
-    public function getLatitude()
-    {
-        return $this->latitude;
-    }
-
-    public function setLatitude($latitude)
-    {
-        $this->latitude = $latitude;
-
-        return $this;
-    }
-
-    public function getLongitude()
-    {
-        return $this->longitude;
-    }
-
-    public function setLongitude($longitude)
-    {
-        $this->longitude = $longitude;
+        $this->country = $country;
 
         return $this;
     }
