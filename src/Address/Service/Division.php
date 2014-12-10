@@ -103,8 +103,10 @@ class Division extends AbstractService
     	
     	if ($country) {
     		$m_country = $this->getServiceCountry()->getCountry($country);
-    		$country_name = $m_country->getName();
-    		$country_id = $m_country->getId();
+    		if($m_country!==null) {
+    			$country_name = $m_country->getName();
+    			$country_id = $m_country->getId();
+    		}
     	}
     	 
     	$LngLat = $this->getLngLat($city, $division_name);

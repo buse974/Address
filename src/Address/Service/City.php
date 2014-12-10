@@ -82,7 +82,7 @@ class City extends AbstractService
     		$division_id = $this->getServiceDivision()->getDivision($division, $country)->getId();
     	}
     	
-    	$res_city = $this->getMapper()->getCityName($city, $division_id, $country_id);
+    	$res_city = $this->getMapper()->getCityByName($city, $division_id, $country_id);
     	
     	if ($res_city->count() > 0) {
     		$m_city = $res_city->current();
@@ -113,14 +113,18 @@ class City extends AbstractService
     	
     	if ($country) {
     		$m_country = $this->getServiceCountry()->getCountry($country);
-    		$country_name = $m_country->getName();
-    		$country_id   = $m_country->getId();
+    		if($m_country!==null) {
+    			$country_name = $m_country->getName();
+    			$country_id   = $m_country->getId();
+    		}
     	}
     	
     	if ($division) {
     		$m_division = $this->getServiceDivision()->getDivision($division, $country);
-    		$division_name = $m_division->getName();
-    		$division_id   = $m_division->getId();
+    		if($m_division!==null) {
+    			$division_name = $m_division->getName();
+    			$division_id   = $m_division->getId();
+    		}
     	}
     	
     	$LngLat = $this->getLngLat($city, $division_name, $country_name);
