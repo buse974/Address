@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="wow" default="main" basedir=".">
+    <property file="${project.basedir}/test.properties" />
+    <target name="main">
+        <property name="dbdeploy.passwordParam" value="-p${dbdeploy.password}" override="yes" />
+        <if>
+            <equals arg1="${dbdeploy.passwordParam}" arg2="-p" />
+            <then>
+                <property name="dbdeploy.passwordParam" value="" override="yes" />
+            </then>
+        </if>
+        <echo msg="Drop database ..." />
+        <exec
+            command="echo 'DROP DATABASE IF EXISTS ${dbdeploy.database}' | mysql --default-character-set=utf8 -h ${dbdeploy.host} -u'${dbdeploy.user}' ${dbdeploy.passwordParam}"
+            dir="${project.basedir}"
+            checkreturn="true" />
+
+        <echo msg="Create database ..." />
+        <exec
+            command="echo 'CREATE DATABASE ${dbdeploy.database}' | mysql --default-character-set=utf8 -h ${dbdeploy.host} -u'${dbdeploy.user}' ${dbdeploy.passwordParam}"
+            dir="${project.basedir}"
+            checkreturn="true" />
+    	
+		<echo message="Insert dataset ..." />
+        <exec
+            command="mysql -h${dbdeploy.host} --default-character-set=utf8 -u'${dbdeploy.user}' ${dbdeploy.passwordParam} ${dbdeploy.database} &lt; ${project.basedir}/../data/structure.sql"
+            dir="${project.basedir}"
+            checkreturn="true" />
+    	<exec
+			command="mysql -h${dbdeploy.host} --default-character-set=utf8 -u'${dbdeploy.user}' ${dbdeploy.passwordParam} ${dbdeploy.database} &lt; ${project.basedir}/../data/country.sql"
+    	    dir="${project.basedir}"
+    	    checkreturn="true" />
+    	<exec
+    	    command="mysql -h${dbdeploy.host} --default-character-set=utf8 -u'${dbdeploy.user}' ${dbdeploy.passwordParam} ${dbdeploy.database} &lt; ${project.basedir}/../data/division-fr.sql"
+    	    dir="${project.basedir}"
+    	    checkreturn="true" />
+    	<exec
+    	    command="mysql -h${dbdeploy.host} --default-character-set=utf8 -u'${dbdeploy.user}' ${dbdeploy.passwordParam} ${dbdeploy.database} &lt; ${project.basedir}/../data/city-fr.sql"
+    	    dir="${project.basedir}"
+    	    checkreturn="true" />
+    	
+    	<echo msg="Write config ..." />
+    	<copy todir="${project.basedir}/config/autoload/" overwrite="true">
+    	     	<filelist dir="${project.basedir}/config/autoload/" files="local.php.dist" />
+    	     	<mapper type="regexp" from="^(.*).dist$" to="\1"/>
+    	     	<filterchain>
+    	        	<expandproperties />
+    	     	</filterchain>
+    		</copy>
+    		
+    		
+   </target>
+</project>

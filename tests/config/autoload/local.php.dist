@@ -1,0 +1,29 @@
+<?php
+/**
+ * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
+ */
+
+return array(
+     'db' => array(
+        'adapters' => array(
+            'db-adapter' => array(
+                'driver' => 'pdo_Mysql',
+                'dsn' => 'mysql:dbname=${dbdeploy.database};host=${dbdeploy.host}',
+                'username' =>  '${dbdeploy.user}',
+                'password' =>  '${dbdeploy.password}',
+                'driver_options' => array(
+                    PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
+                    PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\'',
+                    PDO::ATTR_PERSISTENT => true
+                ),
+            ),
+        ),
+    ),
+    'http-adapter' => array(
+        'adapter' => 'Zend\Http\Client\Adapter\Socket',
+        'sslverifypeer' => false,
+        'maxredirects'   => 5,
+        'timeout'        => 10,
+    ),
+);
