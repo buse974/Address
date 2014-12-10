@@ -55,24 +55,30 @@ class Address extends AbstractService
         $country_name='';
         if (isset($datas['country'])) {
             $m_country = $this->getServiceCountry()->getCountry($datas['country']);
-            $country_id = $m_country->getId();
-            $country_name = $m_country->getShortName(); 
+            if($m_country!==null) {
+            	$country_id = $m_country->getId();
+            	$country_name = $m_country->getShortName(); 
+            }
         }
         
         $division_id = null;
         $division_name= '';
         if (isset($datas['division'])) {
             $m_division = $this->getServiceDivision()->getDivision($datas['division'], $country_id);
-            $division_id = $m_division->getId();
-            $division_name = $m_division->getName();
+            if($m_division!==null) {
+            	$division_id = $m_division->getId();
+            	$division_name = $m_division->getName();
+            }
         }
         
         $city_id = null;
         $city_name = '';
         if (isset($datas['city'])) {
-            $city = $this->getServiceCity()->getCity($datas['city'], $state_id, $country_id);
-            $city_id = $city->getId();
-            $city_name = $city->getName();
+            $city = $this->getServiceCity()->getCity($datas['city'], $division_id, $country_id);
+            if($m_country!==null) {
+            	$city_id = $city->getId();
+            	$city_name = $city->getName();
+            }
         }
         
         $m_address = $this->getModel();
@@ -84,13 +90,13 @@ class Address extends AbstractService
                   ->setDoor((!empty($datas['door']))?$datas['door']:new IsNull())
                   ->setBuilding((!empty($datas['building']))?$datas['building']:new IsNull())
                   ->setCityId($city_id)
-                  ->setDivisionId($state_id)
+                  ->setDivisionId($division_id)
                   ->setCountryId($country_id);
                   
         $res_address = $this->getMapper()->select($m_address);
 
 		if ($res_address->count() > 0) {
-			$m_address = $resAddress->current();
+			$m_address = $res_address->current();
 		} else {
 			$LngLat = $this->getLngLat((!empty($datas['street_name']))?$datas['street_name']:'',
 					         (!empty($datas['street_no']))?$datas['street_no']:'',
