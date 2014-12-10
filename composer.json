@@ -1,24 +1,29 @@
 {
-	"name": "buse974/address",
-	"description": "Module Address for ZF2",
-	"type": "module",
-	"homepage": "https://github.com/buse974/Address",
-	"license": "MIT",
-	"authors": [
-	{
-		"name": "Christophe Robert",
-		"email": "christophe.robert@ti1.fr"
-	}
-	],
-	"require": {
-		"php": ">=5.4",
-    	        "buse974/dal":"*"
-	},
-	"require-dev" : {
-		"phpunit/phpunit" : ">=3.7,<4"
-	},
-	"autoload": {
+    "name": "buse974/address",
+    "description": "Module Address for ZF2",
+    "type": "module",
+    "homepage": "https://github.com/buse974/Address",
+    "license": "MIT",
+    "authors": [
+        {
+	    "name": "Christophe Robert",
+	    "email": "christophe.robert@ti1.fr"
+        }
+    ],
+    "require": {
+	"php": ">=5.4",
+    	"buse974/dal":"dev-master",
+        "zendframework/zendframework": "2.*"
+    },
+    "require-dev" : {
+	"fabpot/php-cs-fixer":"*",
+        "phpunit/phpunit" : ">=4"
+    },
+    "autoload": {
         "psr-0": { "Address": "src/" }
-   },
-   "bin": ["bin/init-db.sh"]
+    },
+    "config": {
+        "bin-dir": "bin/"
+    },
+    "bin": ["bin/init-db.sh"]
 }
