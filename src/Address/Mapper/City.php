@@ -12,44 +12,42 @@ class City extends AbstractMapper
      * @param  array                       $filter
      * @return \Dal\Db\ResultSet\ResultSet
      */
-    public function getList($filter=null)
+    public function getList(array $filter= array())
     {
         $select = $this->tableGateway->getSql()->select();
-        $select->columns(array('id' , 'name', 'libelle','code', 'longitude', 'latitude'));
-        $select->join('division','division.id=city.division_id',array('id' ,'name', 'short_name','code'), $select::JOIN_LEFT);
-        $select->join('country','country.id=city.country_id',array('id' , 'short_name','name'));
+        $select->columns(array('id' , 'name', 'libelle', 'code', 'longitude', 'latitude'));
+        $select->join('division','division.id=city.division_id',array('id' ,'name', 'short_name', 'code'), $select::JOIN_LEFT);
+        $select->join('country','country.id=city.country_id',array('id' , 'short_name', 'name'));
 
-        if (!empty($filter)) {
-            if (!empty($filter['search'])) {
+        if (isset($filter['search'])) {
                 $search = preg_replace('/\s\s+/', ' ', $filter['search']);
                 $select->where(array('(city.libelle LIKE ? ' =>  $search . '%'));
                 $select->where(array('division.name LIKE ? ' =>  $search . '%'),Predicate::OP_OR);
                 $select->where(array('city.name LIKE ? )' => $search . '%'),Predicate::OP_OR);
-            }
-            if (!empty($filter['country']) && is_numeric($filter['country'])) {
-                $select->where(array('country.id' => $filter['country']));
-            }
-            if (!empty($filter['division']) && is_numeric($filter['division'])) {
-                $select->where(array('division.id' => $filter['division']));
-            }
-            if (!empty($filter['sort']) && !empty($filter['sort']['field']) && !empty($filter['sort']['direction'])) {
-                $select->order(array($filter['sort']['field'] => $filter['sort']['direction']));
-            }
+        } 
+        if (isset($filter['country'])) {
+        	$select->where(array('country.id' => $filter['country']));
         }
-
-       return  $this->selectWith($select);
+        if (isset($filter['division'])) {
+            $select->where(array('division.id' => $filter['division']));
+        }
+        if (isset($filter['sort']) && isset($filter['sort']['field']) && isset($filter['sort']['direction'])) {
+        	$select->order(array($filter['sort']['field'] => $filter['sort']['direction']));
+        }
+        
+        return  $this->selectWith($select);
     }
 
-    public function getCityId($city ,$division ,$country)
+    public function getCityByName($city , $division = null, $country = null)
     {
         $select = $this->tableGateway->getSql()->select();
-        $select->columns(array('id' , 'name', 'libelle','code', 'longitude', 'latitude'));
+        $select->columns(array('id' , 'name', 'libelle', 'code', 'longitude', 'latitude'));
         $select->where(array('city.name' =>  $city));
 
-        if ($division && is_numeric($division)) {
+        if ($division) {
             $select->where(array('city.division_id' =>  $division));
         }
-        if ($country && is_numeric($country)) {
+        if ($country) {
             $select->where(array('city.country_id' =>  $country));
         }
 

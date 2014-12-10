@@ -24,5 +24,10 @@ return array(
 				'invokables' => array(
 						'geoloc' => 'Address\Geoloc\Geoloc',
 				),
+				'abstract_factories' => array(
+						'Zend\Cache\Service\StorageCacheAbstractServiceFactory',
+						'Zend\Log\LoggerAbstractServiceFactory',
+						'Zend\Db\Adapter\AdapterAbstractServiceFactory',
+				),
 		),
 );

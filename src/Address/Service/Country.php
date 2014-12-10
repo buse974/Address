@@ -2,73 +2,94 @@
 
 namespace Address\Service;
 
-use Address\Model\Country as ModelCountry;
 use Dal\Service\AbstractService;
 
 class Country extends AbstractService
 {
-    public function getAllCountry()
+    /**
+     * Get list to conutry with filter
+     * 
+     * @param array $filter
+     * 
+     * @return \Dal\Db\ResultSet
+     */
+    public function getList(array $filter = array())
     {
-        return $this->getMapper()->getAllCountry();
+    	$mapper = $this->getMapper();
+    	$res_country = $mapper->usePaginator($filter)->getList($filter);
+    	
+    	return array('count' =>  $mapper->count(), 'results' => $res_country);
     }
 
-    public function getList($filter)
-    {
-        $mapper = $this->getMapper()->checkUsePagination($filter);
-
-        return $mapper->getList($filter);
-    }
-
+    /**
+     * Get country by name or id
+     * 
+     * @param array|string|integer $country
+     * 
+     * @return \Address\Model\Country|null
+     */
     public function getCountry($country)
     {
-        $country_id = null;
-        $country_name = null;
-        $country_obj = null;
-
+    	$m_country = null;
+    	
         if (is_array($country) && isset($country['id']) && is_numeric($country['id'])) {
-            $country_id = $country['id'];
+            $m_country = $this->getCountryById($country['id']);
         } elseif (is_numeric($country)) {
-            $country_id = $country;
+            $m_country = $this->getCountryById($country);
         } elseif (is_array($country) && isset($country['name']) && !empty($country['name'])) {
-            $country_name = $country['name'];
-        } elseif (!empty($country) && is_string($country)) {
-            $country_name = $country;
+            $m_country = $this->getCountryByName($country['name']);
+        } elseif (is_string($country) && !empty($country)) {
+        	$m_country = $this->getCountryByName($country);
         }
 
-        if ($country_id) {
-            $country_obj = $this->getMapper()->select((new ModelCountry())->setId($country_id))->current();
-        } elseif ($country_name) {
-            $resCountry = $this->getMapper()->getCountryId($country_name);
-            if ($resCountry->count() > 0) {
-                $country_obj = $resCountry->current();
-            } else {
-                $result = $this->getServiceGeoloc()->getGeoloc($country_name);
-                $result = $result['results'][0]['geometry']['location'];
-                
-                $modelcountry = new ModelCountry();
-                $modelcountry->setName($country_name)
-                             ->setLongitude($result['lng'])
-                             ->setLatitude($result['lat']);
-                
-                if ($this->getMapper()->insert($modelcountry)) {
-                    $country_obj = $modelcountry->setId($this->getMapper()->getLastInsertValue());
-                }
-            }
-        }
-
-        return $country_obj;
+        return $m_country;
     }
-
+    
     /**
-     * @return \Dal\Mapper\Country
+     * Get country by id
+     * 
+     * @param integer $country
+     * 
+     * @return \Address\Model\Country|null
      */
-    public function getMapper()
+    public function getCountryById($country)
     {
-        return $this->getServiceLocator()->get($this->mapper);
+    	return $this->getMapper()->select($this->getModel()->setId($country))->current();
+    }
+    
+    /**
+     * Get conutry by Name
+     * 
+     * @param string $country
+     * 
+     * @return \Address\Model\Country|null
+     */
+    public function getCountryByName($country)
+    {
+    	$res_country = $this->getMapper()->getCountryByName($country);
+    	
+    	if ($res_country->count() > 0) {
+    		$m_country = $res_country->current();
+    	} else {
+    		$LngLat = $this->getServiceGeoloc()->getLngLat($country);
+    		
+    		$m_country = $this->getModel();
+    		$m_country->setName($country)
+    		          ->setLongitude($LngLat['lng'])
+    		          ->setLatitude($LngLat['lat']);
+    	
+    		if ($this->getMapper()->insert($m_country) === 0) {
+    			new \Exception('Error: insert country');
+    		}
+    		
+    		$m_country->setId($this->getMapper()->getLastInsertValue());
+    	}
+    	
+    	return $m_country;
     }
 
     /**
-     * @return \Dal\Geoloc\Geoloc
+     * @return \Address\Geoloc\Geoloc
      */
     public function getServiceGeoloc()
     {

@@ -17,9 +17,9 @@ class Module implements ConfigProviderInterface
     {
         return array(
                 'Zend\Loader\StandardAutoloader' => array(
-                        'namespaces' => array(
-                                __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
-                        ),
+                    'namespaces' => array(
+                        __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
+                	),
                 ),
                 'Zend\Loader\ClassMapAutoloader' => array(
                     __DIR__ . '/autoload_classmap.php',

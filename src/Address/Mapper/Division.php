@@ -28,14 +28,14 @@ class Division extends AbstractMapper
         return  $this->selectWith($select);
     }
 
-    public function getStateId($state, $country=null)
+    public function getDivisionByName($division, $country=null)
     {
         $select = $this->tableGateway->getSql()->select();
-        $select->columns(array('id'));
-        $select->where(array('(division.name = ? ' =>  $state));
-        $select->where(array('division.short_name = ? )' => $state),Predicate::OP_OR);
+        $select->columns(array('id', 'name', 'short_name', 'libelle', 'code', 'country_id', 'latitude', 'longitude'))
+               ->where(array('(division.name = ? ' =>  $division))
+               ->where(array('division.short_name = ? )' => $division),Predicate::OP_OR);
 
-        if ($country && is_numeric($country)) {
+        if (null !== $country) {
             $select->where(array('division.country_id' =>  $country));
         }
 

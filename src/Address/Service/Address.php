@@ -2,79 +2,118 @@
 
 namespace Address\Service;
 
-use Address\Model\Address as ModelAddress;
 use Zend\Db\Sql\Predicate\IsNull;
 use Dal\Service\AbstractService;
 use Address\Geoloc\Geoloc;
 
 class Address extends AbstractService
 {
-    public function getAddressId(array $datas)
+	/**
+	 * Get address by name or id
+	 *
+	 * @param array|string|integer $address
+	 *
+	 * @return \Address\Model\Address|null
+	 */
+	public function getAddress($address)
+	{
+		$m_address = null;
+		 
+		if (is_array($address) && isset($address['id']) && is_numeric($address['id'])) {
+			$m_address = $this->getAddressById($address['id']);
+		} elseif (is_numeric($address)) {
+			$m_address = $this->getAddressById($address);
+		} elseif (is_array($address)) {
+			$m_address = $this->getAddressByArray($address);
+		}
+	
+		return $m_address;
+	}
+	
+    /**
+     * Get address by id
+     * 
+     * @param integer $address
+     * 
+     * @return \Address\Model\Address|null
+     */
+    public function getAddressById($address)
     {
-        $id=null;
-        $addr = $country_id = $country_name = $state_id = $state_name = $city_id = $city_name = null;
-
-        if (!empty($datas['country'])) {
-            $country = $this->getServiceCountry()->getCountry($datas['country']);
-            if ($country) {
-                $country_id = $country->getId();
-                $country_name = $country->getShortName();
-            }
+    	return $this->getMapper()->select($this->getModel()->setId($address))->current();
+    }
+    
+    /**
+     * Get address by array values
+     *
+     * @param array $address
+     *
+     * @return \Address\Model\Address|null
+     */
+    public function getAddressByArray(array $datas)
+    {
+        $country_id = null;
+        $country_name='';
+        if (isset($datas['country'])) {
+            $m_country = $this->getServiceCountry()->getCountry($datas['country']);
+            $country_id = $m_country->getId();
+            $country_name = $m_country->getShortName(); 
         }
-        if (!empty($datas['division'])) {
-            $state = $this->getServiceDivision()->getDivision($datas['division'], $country_id);
-            if ($state) {
-                $state_id = $state->getId();
-                $state_name = $state->getName();
-            }
+        
+        $division_id = null;
+        $division_name= '';
+        if (isset($datas['division'])) {
+            $m_division = $this->getServiceDivision()->getDivision($datas['division'], $country_id);
+            $division_id = $m_division->getId();
+            $division_name = $m_division->getName();
         }
-        if (!empty($datas['city'])) {
+        
+        $city_id = null;
+        $city_name = '';
+        if (isset($datas['city'])) {
             $city = $this->getServiceCity()->getCity($datas['city'], $state_id, $country_id);
-            if ($city) {
-                $city_id = $city->getId();
-                $city_name = $city->getName();
-            }
+            $city_id = $city->getId();
+            $city_name = $city->getName();
         }
-        if ($country_id || $state_id || $city_id || !empty($datas['street_name'])) {
-            $m_address = new ModelAddress();
-            $m_address->setStreetType((!empty($datas['street_type']))?$datas['street_type']:new IsNull())
-                      ->setStreetName((!empty($datas['street_name']))?$datas['street_name']:new IsNull())
-                      ->setStreetNo((!empty($datas['street_no']))?$datas['street_no']:new IsNull())
-                      ->setApartment((!empty($datas['apartment']))?$datas['apartment']:new IsNull())
-                      ->setFloor((!empty($datas['floor']))?$datas['floor']:new IsNull())
-                      ->setDoor((!empty($datas['door']))?$datas['door']:new IsNull())
-                      ->setBuilding((!empty($datas['building']))?$datas['building']:new IsNull())
-                      ->setCityId($city_id)
-                      ->setDivisionId($state_id)
-                      ->setCountryId($country_id);
+        
+        $m_address = $this->getModel();
+        $m_address->setStreetType((!empty($datas['street_type']))?$datas['street_type']:new IsNull())
+                  ->setStreetName((!empty($datas['street_name']))?$datas['street_name']:new IsNull())
+                  ->setStreetNo((!empty($datas['street_no']))?$datas['street_no']:new IsNull())
+                  ->setApartment((!empty($datas['apartment']))?$datas['apartment']:new IsNull())
+                  ->setFloor((!empty($datas['floor']))?$datas['floor']:new IsNull())
+                  ->setDoor((!empty($datas['door']))?$datas['door']:new IsNull())
+                  ->setBuilding((!empty($datas['building']))?$datas['building']:new IsNull())
+                  ->setCityId($city_id)
+                  ->setDivisionId($state_id)
+                  ->setCountryId($country_id);
+                  
+        $res_address = $this->getMapper()->select($m_address);
 
-            $resAddress = $this->getMapper()->select($m_address);
+		if ($res_address->count() > 0) {
+			$m_address = $resAddress->current();
+		} else {
+			$LngLat = $this->getLngLat((!empty($datas['street_name']))?$datas['street_name']:'',
+					         (!empty($datas['street_no']))?$datas['street_no']:'',
+					         (!empty($datas['street_type']))?$datas['street_type']:'',
+							 $city_name,
+							 $division_name,
+					         (!empty($country_name))? $country_name:''
+    		);
+			
+            $tmz = $this->getServiceGeoloc()->getTimezone($LngLat['lat'], $LngLat['lng']);
 
-            if ($resAddress->count() > 0) {
-                $id = $resAddress->current()->getId();
-            } else {
-            	$result = $this->getServiceGeoloc()->getGeoloc(
-            			((!empty($datas['street_no']))?$datas['street_no'] . " ":"") .
-            			((!empty($datas['street_type']))?$datas['street_type'] . " ":"") . 
-            			((!empty($datas['street_name']))?$datas['street_name'] . " ":"") . 
-            			$city_name . " " .
-            			$state_name . 
-            			((!empty($country_name))? " ," . $country_name:""));
-                $result = $result['results'][0]['geometry']['location'];
+            $m_address->setLongitude($LngLat['lng'])
+    		          ->setLatitude($LngLat['lat'])
+                      ->setTimezone($tmz['timeZoneId']);
                 
-                $tmz = $this->getServiceGeoloc()->getTimezone($result['lat'], $result['lng']);
-
-                $m_address->setLatitude($result['lat'])
-                          ->setLongitude($result['lng'])
-                          ->setTimezone($tmz['timeZoneId']);
-                
-                if ($this->getMapper()->insert($m_address)) {
-                    $id = $this->getMapper()->getLastInsertValue();
-                }
+            if ($this->getMapper()->insert($m_address) === 0) {
+            	throw new \Exception('Error: insert city');
             }
-        }
-
-        return $id;
+                
+			$m_address->setId($this->getMapper()->getLastInsertValue());
+		}
+        
+        return $m_address;
     }
 
     /**
@@ -116,7 +155,7 @@ class Address extends AbstractService
     			((!$m_address->getCountry()->getName() instanceof IsNull) ? ','.$m_address->getCountry()->getName() : ''));
     	
     	$results = $this->getServiceGeoloc()->getGeoloc($addr_str);
-    	 
+    	
     	if($results['status'] === Geoloc::STATUS_OK){
     		$result = $results['results'][0]['geometry']['location'];
     		$tmz = $this->getServiceGeoloc()->getTimezone($result['lat'], $result['lng']);
@@ -132,6 +171,21 @@ class Address extends AbstractService
     	
     	return $ret;
     }
+    
+    /**
+     * Get lng and lat by city division country
+     *
+     * @param stirng $city
+     * @param string $division
+     * @param string $country
+     *
+     * @return array
+     */
+    public function getLngLat($street_name, $street_no, $street_type, $city, $division, $country)
+    {
+    	return $this->getServiceLocator()->get('geoloc')->getLngLat(sprintf('%s %s %s %s %s %s', $street_no, $street_type, $street_name, $city, $division, $country));
+    }
+    
     /**
      * @return \Address\Service\Country
      */

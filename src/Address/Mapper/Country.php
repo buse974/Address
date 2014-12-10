@@ -21,19 +21,11 @@ class Country extends AbstractMapper
         return $this->selectWith($select);
     }
 
-    public function getCountryId($country)
+    public function getCountryByName($country)
     {
         $select = $this->tableGateway->getSql()->select();
         $select->columns(array('id','name','short_name'));
         $select->where(array('(country.name = ? ' =>  $country, 'country.short_name = ? )' => $country),Predicate::OP_OR);
-
-        return $this->selectWith($select);
-    }
-
-    public function getAllCountry()
-    {
-        $select = $this->tableGateway->getSql()->select();
-        $select->columns(array('id','name','short_name'));
 
         return $this->selectWith($select);
     }
