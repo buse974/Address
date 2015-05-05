@@ -138,7 +138,7 @@ class City extends AbstractService
     		   ->setLongitude($LngLat['lng'])
         	   ->setLatitude($LngLat['lat']);
     			
-		if ($this->getMapper()->insert($m_division) === 0) {
+		if ($this->getMapper()->insert($m_city) === 0) {
 			throw new \Exception('Error: insert city');
     	}
     	
