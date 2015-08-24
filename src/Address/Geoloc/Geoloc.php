@@ -43,7 +43,7 @@ class Geoloc implements \Zend\ServiceManager\ServiceLocatorAwareInterface
             throw new \Exception($ret->getReasonPhrase(),$ret->getStatusCode());
         }
 
-        return json_decode($ret->getContent(), true);
+        return json_decode($ret->getBody(), true);
     }
     
     /**
@@ -68,8 +68,8 @@ class Geoloc implements \Zend\ServiceManager\ServiceLocatorAwareInterface
     	if ($ret->isClientError()) {
     		throw new \Exception($ret->getReasonPhrase(),$ret->getStatusCode());
     	}
-    
-    	$result = json_decode($ret->getContent(), true);
+
+    	$result = json_decode($ret->getBody(), true);
     	
     	return $result['results'][0]['geometry']['location'];
     }
@@ -110,7 +110,7 @@ class Geoloc implements \Zend\ServiceManager\ServiceLocatorAwareInterface
     		throw new \Exception($ret->getReasonPhrase(),$ret->getStatusCode());
     	}
     	
-    	return json_decode($ret->getContent(),true);
+    	return json_decode($ret->getBody(),true);
     }
 
     /**
@@ -146,7 +146,7 @@ class Geoloc implements \Zend\ServiceManager\ServiceLocatorAwareInterface
      */
     private function getUrlApiTimezone()
     {
-    	return $this->getServiceLocator()->get('config')['address-conf']['geoloc']['url'] . $this->api_timezone . '/' . $this->output_format . '?' . $this->arrayToString($this->params_timezone);
+    	return $this->getServiceLocator()->get('config')['address-conf']['geoloc']['url'] . $this->api_timezone . '/' . $this->output_format . '?' . $this->arrayToString($this->params_timezone); 
     }
     
     /**
