@@ -25,10 +25,10 @@ class City extends AbstractService
      * Get division by name or id
      * 
      * @param array|string|integer $city
-     * @param array|string|integer|null $division
-     * @param array|string|integer|null $country
+     * @param array|string|integer $division
+     * @param array|string|integer $country
      * 
-     * @return \Address\Model\City|null
+     * @return \Address\Model\City
      */
     public function getCity($city, $division = null, $country = null)
     {
@@ -52,7 +52,7 @@ class City extends AbstractService
      * 
      * @param  integer $city
      * 
-     * @return \Dal\Model\City|null
+     * @return \Dal\Model\City
      */
     public function getCityById($city)
     {
@@ -63,10 +63,10 @@ class City extends AbstractService
      * Get city id
      * 
      * @param string $city
-     * @param array|string|integer|null $division
-     * @param array|string|integer|null $country
+     * @param array|string|integer $division
+     * @param array|string|integer $country
      *
-     * @return \Dal\Model\City|null
+     * @return \Dal\Model\City
      */
     public function getCityByName($city, $division = null, $country = null)
     {
@@ -97,10 +97,10 @@ class City extends AbstractService
      * Add new city
      * 
      * @param  string $city
-     * @param  array|string|integer|null $country
-     * @param  array|string|integer|null $division
-     * @param  string|null $libelle
-     * @param  string|null $state_long
+     * @param  array|string|integer $country
+     * @param  array|string|integer $division
+     * @param  string $libelle
+     * @param  string $state_long
      * 
      * @return \Address\Model\City
      */
@@ -149,6 +149,7 @@ class City extends AbstractService
      * Update city
      * 
      * @param array $datas
+     * 
      * @return integer
      */
     public function update($datas)

@@ -25,9 +25,9 @@ class Division extends AbstractService
      * Get division by name or id
      *
      * @param array|string|integer $division
-     * @param array|string|integer|null $country
+     * @param array|string|integer $country
      *      
-     * @return \Address\Model\Division|null
+     * @return \Address\Model\Division
      */
     public function getDivision($division, $country=null)
     {
@@ -51,7 +51,7 @@ class Division extends AbstractService
      *
      * @param integer $division
      *
-     * @return \Address\Model\Division|null
+     * @return \Address\Model\Division
      */
     public function getDivisionById($division)
     {
@@ -62,9 +62,9 @@ class Division extends AbstractService
      * Get division by Name
      *
      * @param string $division
-     * @param array|string|integer|null $country
+     * @param array|string|integer $country
      *     
-     * @return \Address\Model\Division|null
+     * @return \Address\Model\Division
      */
     public function getDivisionByName($division, $country = null)
     {
@@ -88,10 +88,10 @@ class Division extends AbstractService
      * Add new division
      * 
      * @param string $division
-     * @param array|string|integer|null $country
-     * @param string|null $short_name
-     * @param string|null $libelle
-     * @param integer|null $code
+     * @param array|string|integer $country
+     * @param string $short_name
+     * @param string $libelle
+     * @param integer $code
      * @throws \Exception
      * 
      * @return \Address\Model\Division

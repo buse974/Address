@@ -13,7 +13,7 @@ class Address extends AbstractService
 	 *
 	 * @param array|string|integer $address
 	 *
-	 * @return \Address\Model\Address|null
+	 * @return \Address\Model\Address
 	 */
 	public function getAddress($address)
 	{
@@ -35,7 +35,7 @@ class Address extends AbstractService
      * 
      * @param integer $address
      * 
-     * @return \Address\Model\Address|null
+     * @return \Address\Model\Address
      */
     public function getAddressById($address)
     {
@@ -47,7 +47,7 @@ class Address extends AbstractService
      *
      * @param array $address
      *
-     * @return \Address\Model\Address|null
+     * @return \Address\Model\Address
      */
     public function getAddressByArray(array $datas)
     {
@@ -123,8 +123,8 @@ class Address extends AbstractService
     }
 
     /**
-     *
-     * @param  number	$address
+     * @param  integer	$address
+     * 
      * @return \Address\Model\Address\Relational
      */
     public function get($address)

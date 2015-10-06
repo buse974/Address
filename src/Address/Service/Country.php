@@ -26,7 +26,7 @@ class Country extends AbstractService
      * 
      * @param array|string|integer $country
      * 
-     * @return \Address\Model\Country|null
+     * @return \Address\Model\Country
      */
     public function getCountry($country)
     {
@@ -50,7 +50,7 @@ class Country extends AbstractService
      * 
      * @param integer $country
      * 
-     * @return \Address\Model\Country|null
+     * @return \Address\Model\Country
      */
     public function getCountryById($country)
     {
@@ -62,7 +62,7 @@ class Country extends AbstractService
      * 
      * @param string $country
      * 
-     * @return \Address\Model\Country|null
+     * @return \Address\Model\Country
      */
     public function getCountryByName($country)
     {
