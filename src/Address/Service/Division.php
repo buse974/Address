@@ -75,13 +75,10 @@ class Division extends AbstractService
             
 		$res_division = $this->getMapper()->getDivisionByName($division, $country_id);
             
-		if ($res_division->count() > 0) {
-        	$m_division = $res_division->current();
-        } else {
+		return ($res_division->count() > 0) ?
+        	$res_division->current() :
         	$this->add($division, $country_id);
-		}
-		
-        return $m_division;
+
     }
 
     /**
@@ -109,7 +106,7 @@ class Division extends AbstractService
     		}
     	}
     	 
-    	$LngLat = $this->getLngLat($city, $division_name);
+    	$LngLat = $this->getLngLat($division, $country_name);
     
     	$m_division = $this->getModel();
     	$m_division->setName($division)
