@@ -98,9 +98,12 @@ class Address extends AbstractService
 		if ($res_address->count() > 0) {
 			$m_address = $res_address->current();
 		} else {
-        if (array_key_exists('LngLat', $datas)) {
-            $LngLat = $datas['LngLat'];
-        } else {
+        if (array_key_exists('longitude', $datas)) {
+          $LngLat = [
+            'lat' => $datas['latitude'],
+            'lng' => $datas['longitude']
+          ];
+      } else {
           try {
             $LngLat = $this->getLngLat((!empty($datas['street_name']))?$datas['street_name']:'',
               (!empty($datas['street_no']))?$datas['street_no']:'',
