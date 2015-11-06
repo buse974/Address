@@ -116,8 +116,8 @@ class Address extends AbstractService
           } catch (\Exception $e) {
             syslog(1, $e->getMessage());
           }
-          $tmz = $this->getServiceGeoloc()->getTimezone($LngLat['lat'], $LngLat['lng']);
-        }
+      }
+        $tmz = $this->getServiceGeoloc()->getTimezone($LngLat['lat'], $LngLat['lng']);
 
         $m_address->setLongitude($LngLat['lng'])
                   ->setLatitude($LngLat['lat'])
