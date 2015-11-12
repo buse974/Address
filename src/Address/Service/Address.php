@@ -98,28 +98,35 @@ class Address extends AbstractService
 		if ($res_address->count() > 0) {
 			$m_address = $res_address->current();
 		} else {
-		    try {
-    			$LngLat = $this->getLngLat((!empty($datas['street_name']))?$datas['street_name']:'',
-    					         (!empty($datas['street_no']))?$datas['street_no']:'',
-    					         (!empty($datas['street_type']))?$datas['street_type']:'',
-    							 $city_name,
-    							 $division_name,
-    					         (!empty($country_name))? $country_name:''
-        		);
-    			
-                $tmz = $this->getServiceGeoloc()->getTimezone($LngLat['lat'], $LngLat['lng']);
-    
-                $m_address->setLongitude($LngLat['lng'])
-        		          ->setLatitude($LngLat['lat'])
-                          ->setTimezone($tmz['timeZoneId']);
-		    } catch (\Exception $e) {
-		        syslog(1, $e->getMessage());
-		    }
-            if ($this->getMapper()->insert($m_address) === 0) {
-            	throw new \Exception('Error: insert city');
-            }
-                
-			$m_address->setId($this->getMapper()->getLastInsertValue());
+        if (array_key_exists('longitude', $datas)) {
+          $LngLat = [
+            'lat' => $datas['latitude'],
+            'lng' => $datas['longitude']
+          ];
+      } else {
+          try {
+            $LngLat = $this->getLngLat((!empty($datas['street_name']))?$datas['street_name']:'',
+              (!empty($datas['street_no']))?$datas['street_no']:'',
+              (!empty($datas['street_type']))?$datas['street_type']:'',
+              $city_name,
+              $division_name,
+              (!empty($country_name))? $country_name:''
+            );
+
+          } catch (\Exception $e) {
+            syslog(1, $e->getMessage());
+          }
+      }
+        $tmz = $this->getServiceGeoloc()->getTimezone($LngLat['lat'], $LngLat['lng']);
+
+        $m_address->setLongitude($LngLat['lng'])
+                  ->setLatitude($LngLat['lat'])
+                  ->setTimezone($tmz['timeZoneId']);
+        if ($this->getMapper()->insert($m_address) === 0) {
+          throw new \Exception('Error: insert city');
+        }
+        
+  			$m_address->setId($this->getMapper()->getLastInsertValue());
 		}
         
         return $m_address;
