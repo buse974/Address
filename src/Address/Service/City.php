@@ -1,16 +1,16 @@
 <?php
-
 namespace Address\Service;
 
 use Dal\Service\AbstractService;
 
 class City extends AbstractService
 {
-	/**
+
+    /**
      * Get list to city with filter
-     * 
-     * @param array $filter
-     * 
+     *
+     * @param array $filter            
+     *
      * @return \Dal\Db\ResultSet
      */
     public function getList(array $filter = array())
@@ -18,195 +18,202 @@ class City extends AbstractService
         $mapper = $this->getMapper();
         $res_city = $mapper->usePaginator($filter)->getList($filter);
         
-    	return array('count' =>  $mapper->count(), 'results' => $res_city);
+        return array('count' => $mapper->count(),'results' => $res_city);
     }
 
     /**
      * Get division by name or id
-     * 
-     * @param array|string|integer $city
-     * @param array|string|integer $division
-     * @param array|string|integer $country
-     * 
+     *
+     * @param array|string|integer $city            
+     * @param array|string|integer $division            
+     * @param array|string|integer $country            
+     *
      * @return \Address\Model\City
      */
     public function getCity($city, $division = null, $country = null)
     {
-    	$m_city = null;
-    
-    	if (is_array($city) && isset($city['id']) && is_numeric($city['id'])) {
-    		$m_city = $this->getCityById($city['id']);
-    	} elseif (is_numeric($city)) {
-    		$m_city = $this->getCityById($city);
-    	} elseif (is_array($city) && isset($city['name']) && !empty($city['name'])) {
-    		$m_city = $this->getCityByName($city['name'], $division, $country);
-    	} elseif (is_string($city) && !empty($city)) {
-    		$m_city = $this->getCityByName($city, $division, $country);
-    	}
-    
-    	return $m_city;
+        $m_city = null;
+        
+        if (is_array($city) && isset($city['id']) && is_numeric($city['id'])) {
+            $m_city = $this->getCityById($city['id']);
+        } elseif (is_numeric($city)) {
+            $m_city = $this->getCityById($city);
+        } elseif (is_array($city) && isset($city['name']) && ! empty($city['name'])) {
+            $m_city = $this->getCityByName($city['name'], $division, $country);
+        } elseif (is_string($city) && ! empty($city)) {
+            $m_city = $this->getCityByName($city, $division, $country);
+        }
+        
+        return $m_city;
     }
-    
+
     /**
      * Get city by id
-     * 
-     * @param  integer $city
-     * 
-     * @return \Dal\Model\City
+     *
+     * @param integer $city            
+     *
+     * @return \Address\Model\City
      */
     public function getCityById($city)
     {
-		return  $this->getMapper()->select($this->getModel()->setId($city))->current();
+        return $this->getMapper()
+            ->select($this->getModel()
+            ->setId($city))
+            ->current();
     }
-    
+
     /**
      * Get city id
-     * 
-     * @param string $city
-     * @param array|string|integer $division
-     * @param array|string|integer $country
      *
-     * @return \Dal\Model\City
+     * @param string $city            
+     * @param array|string|integer $division            
+     * @param array|string|integer $country            
+     *
+     * @return \Address\Model\City
      */
     public function getCityByName($city, $division = null, $country = null)
     {
-    	$m_city = null;
-    	
-    	$country_id = null;
-    	if ($country) {
-    		$country_id = $this->getServiceCountry()->getCountry($country)->getId();
-    	}
-    	
-    	$division_id = null;
-    	if ($division) {
-    		$division_id = $this->getServiceDivision()->getDivision($division, $country)->getId();
-    	}
-    	
-    	$res_city = $this->getMapper()->getCityByName($city, $division_id, $country_id);
-    	
-    	if ($res_city->count() > 0) {
-    		$m_city = $res_city->current();
-    	} else {
-    		$m_city = $this->add($city, $division_id, $country_id);
-    	}
-    	
-    	return $m_city;
+        $country_id = null;
+        if ($country) {
+            $m_country = $this->getServiceCountry()->getCountry($country);
+            if ($m_country !== null) {
+                $country_id = $m_country->getId();
+            }
+        }
+        
+        $division_id = null;
+        if ($division) {
+            $m_division = $this->getServiceDivision()->getDivision($division, $country);
+            if ($m_division !== null) {
+                $division_id = $m_division->getId();
+            }
+        }
+        
+        $res_city = $this->getMapper()->getCityByName($city, $division_id, $country_id);
+        
+        return ($res_city->count() > 0) ? $res_city->current() : $this->add($city, $division_id, $country_id);
     }
 
     /**
      * Add new city
-     * 
-     * @param  string $city
-     * @param  array|string|integer $country
-     * @param  array|string|integer $division
-     * @param  string $libelle
-     * @param  string $state_long
-     * 
+     *
+     * @param string $city            
+     * @param array|string|integer $country            
+     * @param array|string|integer $division            
+     * @param string $libelle            
+     * @param string $state_long            
+     *
      * @return \Address\Model\City
      */
-    public function add($city, $division = null, $country = null, $libelle=null, $code=null)
+    public function add($city, $division = null, $country = null, $libelle = null, $code = null)
     {
-    	$country_name = '';
-    	$division_name = '';
-    	$country_id = null;
-    	$division_id = null;
-    	
-    	if ($country) {
-    		$m_country = $this->getServiceCountry()->getCountry($country);
-    		if($m_country!==null) {
-    			$country_name = $m_country->getName();
-    			$country_id   = $m_country->getId();
-    		}
-    	}
-    	
-    	if ($division) {
-    		$m_division = $this->getServiceDivision()->getDivision($division, $country);
-    		if($m_division!==null) {
-    			$division_name = $m_division->getName();
-    			$division_id   = $m_division->getId();
-    		}
-    	}
-    	
-    	$LngLat = $this->getLngLat($city, $division_name, $country_name);
-
-		$m_city = $this->getModel();
-    	$m_city->setName($city)
-    		   ->setCountryId($country_id)
-    		   ->setDivisionId($division_id)
-    		   ->setLibelle($libelle)
-    		   ->setCode($code)
-    		   ->setLongitude($LngLat['lng'])
-        	   ->setLatitude($LngLat['lat']);
-    			
-		if ($this->getMapper()->insert($m_city) === 0) {
-			throw new \Exception('Error: insert city');
-    	}
-    	
-    	return $m_city->setId($this->getMapper()->getLastInsertValue());
+        $country_id = null;
+        $country_name = '';
+        if ($country) {
+            $m_country = $this->getServiceCountry()->getCountry($country);
+            if ($m_country !== null) {
+                $country_name = $m_country->getName();
+                $country_id = $m_country->getId();
+            }
+        }
+        
+        $division_id = null;
+        $division_name = '';
+        if ($division) {
+            $m_division = $this->getServiceDivision()->getDivision($division, $country);
+            if ($m_division !== null) {
+                $division_name = $m_division->getName();
+                $division_id = $m_division->getId();
+            }
+        }
+        
+        $m_city = $this->getModel();
+        $m_city->setName($city)
+            ->setCountryId($country_id)
+            ->setDivisionId($division_id)
+            ->setLibelle($libelle)
+            ->setCode($code);
+        
+        if (null !== ($LngLat = $this->getLngLat($city, $division_name, $country_name))) {
+            $m_city->setLongitude($LngLat['lng'])->setLatitude($LngLat['lat']);
+        }
+        
+        if ($this->getMapper()->insert($m_city) === 0) {
+            throw new \Exception('Error: insert city');
+        }
+        
+        return $m_city->setId($this->getMapper()
+            ->getLastInsertValue());
     }
-    
+
     /**
      * Update city
-     * 
-     * @param array $datas
-     * 
+     *
+     * @param array $data            
+     *
      * @return integer
      */
-    public function update($datas)
+    public function update($data)
     {
-    	if (!isset($datas['city']['id'])) {
-    		return;
-    	}
-    
-    	$country_id = null;
-    	if (isset($datas['country'])) {
-    		$m_country = $this->getServiceCountry()->getCountry($datas['country']);
-    		$country_id = $m_country->getId();
-    	}
-    	$division_id = null;
-    	if (isset($datas['division'])) {
-    		$m_division = $this->getServiceDivision()->getDivision($datas['division'],$country_id);
-    		$division_id = $m_division->getId();
-    	}
-
-    	$m_city = $this->getModel();
-    	$m_city->setId($datas['city']['id'])
-    	       ->setName(isset($datas['city']['name']) ? $datas['city']['name']:null)
-    	       ->setCode(isset($datas['city']['code']) ? $datas['city']['code']:null)
-    	       ->setLibelle(isset($datas['city']['libelle']) ? $datas['city']['libelle']:null)
-    	       ->setCountryId($country_id)
-    	       ->setDivisionId($division_id);
-    
-    	return $this->getMapper()->update($m_city);
+        if (! isset($data['city']['id'])) {
+            return;
+        }
+        
+        $m_city = $this->getModel();
+        $m_city->setId($data['city']['id']);
+        
+        if (isset($data['country'])) {
+            $contry = $this->getServiceCountry()->getCountry($data['country']);
+            $m_city->setCountryId(($contry) ? $contry->getId() : null);
+        }
+        if (isset($data['division'])) {
+            $division = $this->getServiceDivision()->getDivision($data['division'], $m_city->getCountryId());
+            $m_city->setDivisionId(($division) ? $division->getId() : null);
+        }
+        if (isset($data['city']['name'])) {
+            $m_city->setName($data['city']['name']);
+        }
+        if (isset($data['city']['code'])) {
+            $m_city->setCode($data['city']['code']);
+        }
+        if (isset($data['city']['libelle'])) {
+            $m_city->setLibelle($data['city']['libelle']);
+        }
+        
+        return $this->getMapper()->update($m_city);
     }
-    
+
     /**
      * Delete city by Id
-     * 
-     * @param integer $city
-     * 
+     *
+     * @param integer $city            
+     *
      * @return integer
      */
     public function delete($city)
     {
-    	return $this->getMapper()->delete($this->getModel()->setId($city));
+        return $this->getMapper()->delete($this->getModel()
+            ->setId($city));
     }
-    
+
     /**
      * Get lng and lat by city division country
-     * 
-     * @param stirng $city
-     * @param string $division
-     * @param string $country
-     * 
+     *
+     * @param stirng $city            
+     * @param string $division            
+     * @param string $country            
+     *
      * @return array
      */
     public function getLngLat($city, $division = '', $country = '')
     {
-    	return $this->getServiceLocator()->get('geoloc')->getLngLat(sprintf('%s %s %s',$city, $division, $country));
+        return $this->getServiceLocator()
+            ->get('geoloc')
+            ->getLngLat(sprintf('%s %s %s', $city, $division, $country));
     }
-    
+
     /**
+     *
      * @return \Address\Service\Country
      */
     public function getServiceCountry()
@@ -215,6 +222,7 @@ class City extends AbstractService
     }
 
     /**
+     *
      * @return \Address\Service\Division
      */
     public function getServiceDivision()

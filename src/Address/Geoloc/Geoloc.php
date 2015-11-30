@@ -31,113 +31,47 @@ class Geoloc implements \Zend\ServiceManager\ServiceLocatorAwareInterface
     protected $output_format = 'json';
 
     /**
-     * Get array geoloc google API
-     *
-     * @param string $address            
-     * @throws \Exception
-     *
-     * @return array
-     */
-    public function getGeoloc($address)
-    {
-        $this->params_location['address'] = urlencode($address);
-        
-        $conf = $this->getServiceLocator()->get('config');
-        $conf_addr = $conf['address-conf'];
-        $cli = new Client();
-        $cli->setOptions($conf[$conf_addr['geoloc']['adapter']]);
-        $cli->setUri($this->getUrlApiLocation());
-        $ret = $cli->send();
-        
-        if ($ret->isClientError()) {
-            throw new \Exception($ret->getReasonPhrase(), $ret->getStatusCode());
-        }
-        
-        $result = json_decode($ret->getBody(), true);
-        
-        if ($result['status'] !== self::STATUS_OK) {
-            throw new \Exception('Google Api Status : '. $result['status']);
-        }
-        
-        return $result;
-    }
-
-    /**
      * Get lng lat by address
      *
      * @param string $address            
-     * @throws \Exception
      *
      * @return array
      */
     public function getLngLat($address)
     {
-        $this->params_location['address'] = urlencode($address);
+        $result = $this->send($this->getUrlApiLocation($address));
         
-        $conf = $this->getServiceLocator()->get('config');
-        $conf_addr = $conf['address-conf'];
-        $cli = new Client();
-        $cli->setOptions($conf[$conf_addr['geoloc']['adapter']]);
-        $cli->setUri($this->getUrlApiLocation());
-        $ret = $cli->send();
-        
-        if ($ret->isClientError()) {
-            throw new \Exception($ret->getReasonPhrase(), $ret->getStatusCode());
+        if ($result===null || $result['status'] !== self::STATUS_OK) {
+            return null;
         }
         
-        $result = json_decode($ret->getBody(), true);
-        
-        if ($result['status'] !== self::STATUS_OK) {
-            throw new \Exception('Google Api Status : '. $result['status']);
-        }
-        
-        $result['results'][0]['geometry']['location'];
-    }
-
-    /**
-     * Get Timezone by address
-     *
-     * @param unknown $address            
-     *
-     * @return array
-     */
-    public function getTimezoneByAddr($address)
-    {
-        $geo = $this->getLngLat($address);
-        
-        return $this->getTimezone($geo[0], $geo[1]);
+        return $result['results'][0]['geometry']['location'];
     }
 
     /**
      * Get Timezone
-     * 
-     * @param unknown $latitude            
-     * @param unknown $longitude            
-     * @throws \Exception
+     *
+     * @param double $latitude            
+     * @param double $longitude            
      *
      * @return array
      */
     public function getTimezone($latitude, $longitude)
     {
-        $this->params_timezone['location'] = sprintf('%s,%s', $latitude, $longitude);
-        $conf = $this->getServiceLocator()->get('config');
-        $conf_addr = $conf['address-conf'];
-        $cli = new Client();
-        $cli->setOptions($conf[$conf_addr['geoloc']['adapter']]);
-        $cli->setUri($this->getUrlApiTimezone());
-        $ret = $cli->send();
+        $result = $this->send($this->getUrlApiTimezone($latitude, $longitude));
         
-        if ($ret->isClientError()) {
-            throw new \Exception($ret->getReasonPhrase(), $ret->getStatusCode());
+        if ($result===null || $result['status'] !== self::STATUS_OK) {
+            return null;
         }
         
-        return json_decode($ret->getBody(), true);
+        return $result;
     }
+
 
     /**
      * Convert array to string url
      *
-     * @param unknown $params            
+     * @param array $params            
      * @return string
      */
     private function arrayToString($params)
@@ -155,8 +89,10 @@ class Geoloc implements \Zend\ServiceManager\ServiceLocatorAwareInterface
      *
      * @return string
      */
-    private function getUrlApiLocation()
+    private function getUrlApiLocation($address)
     {
+        $this->params_location['address'] = urlencode($address);
+        
         return $this->getServiceLocator()->get('config')['address-conf']['geoloc']['url'] . $this->api_location . '/' . $this->output_format . '?' . $this->arrayToString($this->params_location);
     }
 
@@ -165,8 +101,10 @@ class Geoloc implements \Zend\ServiceManager\ServiceLocatorAwareInterface
      *
      * @return string
      */
-    private function getUrlApiTimezone()
+    private function getUrlApiTimezone($latitude, $longitude)
     {
+        $this->params_timezone['location'] = sprintf('%s,%s', $latitude, $longitude);
+        
         return $this->getServiceLocator()->get('config')['address-conf']['geoloc']['url'] . $this->api_timezone . '/' . $this->output_format . '?' . $this->arrayToString($this->params_timezone);
     }
 
@@ -192,5 +130,26 @@ class Geoloc implements \Zend\ServiceManager\ServiceLocatorAwareInterface
     public function getServiceLocator()
     {
         return $this->serviceLocator;
+    }
+    
+    public function send($url)
+    {
+        $conf = $this->getServiceLocator()->get('config');
+        $conf_addr = $conf['address-conf'];
+        $cli = $this->getClient();
+        $cli->setOptions($conf[$conf_addr['geoloc']['adapter']]);
+        $cli->setUri($url);
+        $ret = $cli->send();
+        
+        if ($ret->isClientError()) {
+            return null;
+        }
+        
+        return json_decode($ret->getBody(), true);
+    }
+    
+    public function getClient()
+    {
+        return new Client();
     }
 }

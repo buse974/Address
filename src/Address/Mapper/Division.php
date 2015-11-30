@@ -7,7 +7,7 @@ use Dal\Mapper\AbstractMapper;
 
 class Division extends AbstractMapper
 {
-    public function getList($filter)
+    public function getList(array $filter = array())
     {
         $select = $this->tableGateway->getSql()->select();
         $select->columns(array('id' , 'name', 'short_name','code'));
@@ -20,7 +20,7 @@ class Division extends AbstractMapper
                 $select->where(array('country.name LIKE ? )' => $search . '%'),Predicate::OP_OR);
             }
 
-            if (!empty($filter['country']) && is_numeric($filter['country'])) {
+            if (!empty($filter['country']) && is_numeric($filter['country']) && $filter['country'] > 0) {
                 $select->where(array('country.id' =>  $filter['country']));
             }
         }
@@ -35,7 +35,7 @@ class Division extends AbstractMapper
                ->where(array('(division.name = ? ' =>  $division))
                ->where(array('division.short_name = ? )' => $division),Predicate::OP_OR);
 
-        if (null !== $country) {
+        if (is_numeric($country) && $country > 0) {
             $select->where(array('division.country_id' =>  $country));
         }
 

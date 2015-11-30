@@ -169,7 +169,7 @@ class Address extends AbstractModel
 
     public function getFloor()
     {
-        return $this->door;
+        return $this->floor;
     }
 
     public function setFloor($floor)

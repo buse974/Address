@@ -25,10 +25,10 @@ class City extends AbstractMapper
                 $select->where(array('division.name LIKE ? ' =>  $search . '%'),Predicate::OP_OR);
                 $select->where(array('city.name LIKE ? )' => $search . '%'),Predicate::OP_OR);
         } 
-        if (isset($filter['country'])) {
+        if (!empty($filter['country']) && is_numeric($filter['country']) && $filter['country'] > 0) {
         	$select->where(array('country.id' => $filter['country']));
         }
-        if (isset($filter['division'])) {
+        if (!empty($filter['division']) && is_numeric($filter['division']) && $filter['division'] > 0) {
             $select->where(array('division.id' => $filter['division']));
         }
         if (isset($filter['sort']) && isset($filter['sort']['field']) && isset($filter['sort']['direction'])) {
@@ -44,10 +44,10 @@ class City extends AbstractMapper
         $select->columns(array('id' , 'name', 'libelle', 'code', 'longitude', 'latitude'));
         $select->where(array('city.name' =>  $city));
 
-        if ($division) {
+        if (is_numeric($division) && $division > 0) {
             $select->where(array('city.division_id' =>  $division));
         }
-        if ($country) {
+        if (is_numeric($country) && $country > 0) {
             $select->where(array('city.country_id' =>  $country));
         }
 

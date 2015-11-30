@@ -7,7 +7,7 @@ use Dal\Mapper\AbstractMapper;
 
 class Country extends AbstractMapper
 {
-    public function getList($filter)
+    public function getList(array $filter = array())
     {
         $select = $this->tableGateway->getSql()->select();
 
