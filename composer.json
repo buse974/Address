@@ -21,7 +21,7 @@
         "phpunit/phpunit" : ">=4"
     },
     "autoload": {
-        "psr-0": { "Address": "src/" }
+        "psr-4": { "Address\\": "src/" }
     },
     "config": {
         "bin-dir": "bin/"

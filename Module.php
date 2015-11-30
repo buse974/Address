@@ -8,20 +8,12 @@ use Zend\ServiceManager\ServiceLocatorInterface;
 class Module implements ConfigProviderInterface
 {
     protected $config;
+
     protected $config_name = 'address-conf';
 
     public function getAutoloaderConfig()
     {
-        return array(
-                'Zend\Loader\StandardAutoloader' => array(
-                    'namespaces' => array(
-                        __NAMESPACE__ => __DIR__.'/src/'.__NAMESPACE__,
-                    ),
-                ),
-                'Zend\Loader\ClassMapAutoloader' => array(
-                    __DIR__.'/autoload_classmap.php',
-                ),
-        );
+        return array('Zend\Loader\StandardAutoloader' => array('namespaces' => array(__NAMESPACE__ => __DIR__.'/src/'.__NAMESPACE__)));
     }
 
     public function getConfig()
