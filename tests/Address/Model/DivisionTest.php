@@ -16,6 +16,11 @@ class DivisionTest extends AbstractHttpControllerTestCase
     public function testExchange()
     {
         $division = new \Address\Model\Division();
+        
+        $reflector = new \ReflectionProperty('\Address\Model\Division', 'array_prefix');
+        $reflector->setAccessible(true);
+        $reflector->setValue($division, []);
+        
         $data = [
             'id' => 'id', 
             'name' => 'name', 

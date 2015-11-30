@@ -15,11 +15,8 @@ class City extends BaseCity
     {
         parent::exchangeArray($data);
 
-        $this->country = new Country($this);
-        $this->division = new Division($this);
-
-        $this->country->exchangeArray($data);
-        $this->division->exchangeArray($data);
+        $this->division = $this->requireModel('addr_model_division', $data);
+        $this->country = $this->requireModel('addr_model_country', $data);
     }
 
     public function getCountry()

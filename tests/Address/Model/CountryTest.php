@@ -16,6 +16,11 @@ class CountryTest extends AbstractHttpControllerTestCase
     public function testExchange()
     {
         $country = new \Address\Model\Country();
+        
+        $reflector = new \ReflectionProperty('\Address\Model\Country', 'array_prefix');
+        $reflector->setAccessible(true);
+        $reflector->setValue($country, []);
+        
         $data = [
             'id' => 'id', 
             'iso2' => 'iso2', 

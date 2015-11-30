@@ -16,6 +16,11 @@ class CityTest extends AbstractHttpControllerTestCase
     public function testExchange()
     {
         $city = new \Address\Model\City();
+        
+        $reflector = new \ReflectionProperty('\Address\Model\City', 'array_prefix');
+        $reflector->setAccessible(true);
+        $reflector->setValue($city, []);
+        
         $data = [
             'id' => 'id', 
             'name' => 'name', 

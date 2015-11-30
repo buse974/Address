@@ -13,9 +13,7 @@ class Division extends BaseDivision
     {
         parent::exchangeArray($data);
 
-        $this->country = new Country($this);
-
-        $this->country->exchangeArray($data);
+        $this->country = $this->requireModel('addr_model_country', $data);
     }
 
     public function getCountry()

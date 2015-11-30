@@ -16,6 +16,11 @@ class AddressTest extends AbstractHttpControllerTestCase
     public function testExchange()
     {
         $addr = new \Address\Model\Address();
+        
+        $reflector = new \ReflectionProperty('\Address\Model\Address', 'array_prefix');
+        $reflector->setAccessible(true);
+        $reflector->setValue($addr, []);
+
         $data = [
             'id' => 'id', 
             'street_no' => 'street_no', 
