@@ -4,9 +4,6 @@ namespace Address;
 
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
-use Address\Db\ResultSet\ResultSet;
-use Address\Db\TableGateway\TableGateway;
-use Address\Db\Sql\Sql;
 
 class Module implements ConfigProviderInterface
 {
@@ -18,23 +15,22 @@ class Module implements ConfigProviderInterface
         return array(
                 'Zend\Loader\StandardAutoloader' => array(
                     'namespaces' => array(
-                        __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
-                	),
+                        __NAMESPACE__ => __DIR__.'/src/'.__NAMESPACE__,
+                    ),
                 ),
                 'Zend\Loader\ClassMapAutoloader' => array(
-                    __DIR__ . '/autoload_classmap.php',
+                    __DIR__.'/autoload_classmap.php',
                 ),
         );
     }
 
     public function getConfig()
     {
-        return include __DIR__ . '/config/module.config.php';
+        return include __DIR__.'/config/module.config.php';
     }
 
     public function getConfigAddr(ServiceLocatorInterface $serviceLocator)
     {
-
         if (null !== $this->config) {
             return $this->config;
         }

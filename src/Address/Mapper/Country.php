@@ -11,11 +11,11 @@ class Country extends AbstractMapper
     {
         $select = $this->tableGateway->getSql()->select();
 
-        $select->columns(array('id','short_name', 'name'));
+        $select->columns(array('id', 'short_name', 'name'));
 
         if (isset($filter['search'])) {
             $search = preg_replace('/\s\s+/', ' ', $filter['search']);
-            $select->where(array('short_name LIKE ?' => $search . '%'));
+            $select->where(array('short_name LIKE ?' => $search.'%'));
         }
 
         return $this->selectWith($select);
@@ -24,8 +24,8 @@ class Country extends AbstractMapper
     public function getCountryByName($country)
     {
         $select = $this->tableGateway->getSql()->select();
-        $select->columns(array('id','name','short_name'));
-        $select->where(array('(country.name = ? ' =>  $country, 'country.short_name = ? )' => $country),Predicate::OP_OR);
+        $select->columns(array('id', 'name', 'short_name'));
+        $select->where(array('(country.name = ? ' => $country, 'country.short_name = ? )' => $country), Predicate::OP_OR);
 
         return $this->selectWith($select);
     }

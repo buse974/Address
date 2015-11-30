@@ -2,7 +2,6 @@
 
 namespace Address\Model;
 
-use Address\Model\Country;
 use Address\Model\Base\Division as BaseDivision;
 
 class Division extends BaseDivision

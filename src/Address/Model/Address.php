@@ -3,9 +3,6 @@
 namespace Address\Model;
 
 use Address\Model\Base\Address as BaseAddress;
-use Address\Model\City;
-use Address\Model\Division;
-use Address\Model\Country;
 
 class Address extends BaseAddress
 {
@@ -17,8 +14,8 @@ class Address extends BaseAddress
     {
         parent::exchangeArray($data);
 
-        $this->city = $this->requireModel('addr_model_city', $data); 
-        $this->division = $this->requireModel('addr_model_division', $data); 
+        $this->city = $this->requireModel('addr_model_city', $data);
+        $this->division = $this->requireModel('addr_model_division', $data);
         $this->country = $this->requireModel('addr_model_country', $data);
     }
 

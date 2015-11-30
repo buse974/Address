@@ -1,11 +1,11 @@
 <?php
+
 namespace Address\Geoloc;
 
 use Zend\Http\Client;
 
 class Geoloc implements \Zend\ServiceManager\ServiceLocatorAwareInterface
 {
-
     const STATUS_OK = 'OK';
 
     const STATUS_ZERO_RESULTS = 'ZERO_RESULTS';
@@ -31,99 +31,99 @@ class Geoloc implements \Zend\ServiceManager\ServiceLocatorAwareInterface
     protected $output_format = 'json';
 
     /**
-     * Get lng lat by address
+     * Get lng lat by address.
      *
-     * @param string $address            
+     * @param string $address
      *
      * @return array
      */
     public function getLngLat($address)
     {
         $result = $this->send($this->getUrlApiLocation($address));
-        
-        if ($result===null || $result['status'] !== self::STATUS_OK) {
-            return null;
+
+        if ($result === null || $result['status'] !== self::STATUS_OK) {
+            return;
         }
-        
+
         return $result['results'][0]['geometry']['location'];
     }
 
     /**
-     * Get Timezone
+     * Get Timezone.
      *
-     * @param double $latitude            
-     * @param double $longitude            
+     * @param float $latitude
+     * @param float $longitude
      *
      * @return array
      */
     public function getTimezone($latitude, $longitude)
     {
         $result = $this->send($this->getUrlApiTimezone($latitude, $longitude));
-        
-        if ($result===null || $result['status'] !== self::STATUS_OK) {
-            return null;
+
+        if ($result === null || $result['status'] !== self::STATUS_OK) {
+            return;
         }
-        
+
         return $result;
     }
 
-
     /**
-     * Convert array to string url
+     * Convert array to string url.
      *
-     * @param array $params            
+     * @param array $params
+     *
      * @return string
      */
     private function arrayToString($params)
     {
         $str_params = array();
         foreach ($params as $key => $value) {
-            $str_params[] = $key . '=' . $value;
+            $str_params[] = $key.'='.$value;
         }
-        
-        return implode("&", $str_params);
+
+        return implode('&', $str_params);
     }
 
     /**
-     * Get url api google geocode
+     * Get url api google geocode.
      *
      * @return string
      */
     private function getUrlApiLocation($address)
     {
         $this->params_location['address'] = urlencode($address);
-        
-        return $this->getServiceLocator()->get('config')['address-conf']['geoloc']['url'] . $this->api_location . '/' . $this->output_format . '?' . $this->arrayToString($this->params_location);
+
+        return $this->getServiceLocator()->get('config')['address-conf']['geoloc']['url'].$this->api_location.'/'.$this->output_format.'?'.$this->arrayToString($this->params_location);
     }
 
     /**
-     * Get url api google timezone
+     * Get url api google timezone.
      *
      * @return string
      */
     private function getUrlApiTimezone($latitude, $longitude)
     {
         $this->params_timezone['location'] = sprintf('%s,%s', $latitude, $longitude);
-        
-        return $this->getServiceLocator()->get('config')['address-conf']['geoloc']['url'] . $this->api_timezone . '/' . $this->output_format . '?' . $this->arrayToString($this->params_timezone);
+
+        return $this->getServiceLocator()->get('config')['address-conf']['geoloc']['url'].$this->api_timezone.'/'.$this->output_format.'?'.$this->arrayToString($this->params_timezone);
     }
 
     /**
-     * Set service locator
+     * Set service locator.
      *
-     * @param ServiceLocatorInterface $serviceLocator            
+     * @param ServiceLocatorInterface $serviceLocator
      */
     public function setServiceLocator(\Zend\ServiceManager\ServiceLocatorInterface $serviceLocator)
     {
         if ($this->serviceLocator === null) {
             $this->serviceLocator = $serviceLocator;
         }
-        
+
         return $this;
     }
 
     /**
-     * Get service locator
+     * Get service locator.
      *
      * @return ServiceLocatorInterface
      */
@@ -131,7 +131,7 @@ class Geoloc implements \Zend\ServiceManager\ServiceLocatorAwareInterface
     {
         return $this->serviceLocator;
     }
-    
+
     public function send($url)
     {
         $conf = $this->getServiceLocator()->get('config');
@@ -140,14 +140,14 @@ class Geoloc implements \Zend\ServiceManager\ServiceLocatorAwareInterface
         $cli->setOptions($conf[$conf_addr['geoloc']['adapter']]);
         $cli->setUri($url);
         $ret = $cli->send();
-        
+
         if ($ret->isClientError()) {
-            return null;
+            return;
         }
-        
+
         return json_decode($ret->getBody(), true);
     }
-    
+
     public function getClient()
     {
         return new Client();

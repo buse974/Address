@@ -1,6 +1,6 @@
 <?php
 
-namespace Address\Model\base;
+namespace Address\Model\Base;
 
 use Dal\Model\AbstractModel;
 
@@ -101,29 +101,28 @@ class Country extends AbstractModel
 
         return $this;
     }
-    
+
     public function getLongitude()
     {
-    	return $this->longitude;
-    }
-    
-    public function setLongitude($longitude)
-    {
-    	$this->longitude = $longitude;
-    
-    	return $this;
-    }
-    
-    public function getLatitude()
-    {
-    	return $this->latitude;
-    }
-    
-    public function setLatitude($latitude)
-    {
-    	$this->latitude = $latitude;
-    
-    	return $this;
+        return $this->longitude;
     }
 
+    public function setLongitude($longitude)
+    {
+        $this->longitude = $longitude;
+
+        return $this;
+    }
+
+    public function getLatitude()
+    {
+        return $this->latitude;
+    }
+
+    public function setLatitude($latitude)
+    {
+        $this->latitude = $latitude;
+
+        return $this;
+    }
 }

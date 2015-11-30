@@ -1,6 +1,6 @@
 <?php
 
-namespace Address\Model\base;
+namespace Address\Model\Base;
 
 use Dal\Model\AbstractModel;
 

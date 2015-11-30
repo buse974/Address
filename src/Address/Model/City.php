@@ -2,8 +2,6 @@
 
 namespace Address\Model;
 
-use Address\Model\Country;
-use Address\Model\Division;
 use Address\Model\Base\City as BaseCity;
 
 class City extends BaseCity

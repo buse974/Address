@@ -1,15 +1,15 @@
 <?php
+
 namespace Address\Service;
 
 use Dal\Service\AbstractService;
 
 class City extends AbstractService
 {
-
     /**
-     * Get list to city with filter
+     * Get list to city with filter.
      *
-     * @param array $filter            
+     * @param array $filter
      *
      * @return \Dal\Db\ResultSet
      */
@@ -17,40 +17,40 @@ class City extends AbstractService
     {
         $mapper = $this->getMapper();
         $res_city = $mapper->usePaginator($filter)->getList($filter);
-        
+
         return array('count' => $mapper->count(),'results' => $res_city);
     }
 
     /**
-     * Get division by name or id
+     * Get division by name or id.
      *
-     * @param array|string|integer $city            
-     * @param array|string|integer $division            
-     * @param array|string|integer $country            
+     * @param array|string|int $city
+     * @param array|string|int $division
+     * @param array|string|int $country
      *
      * @return \Address\Model\City
      */
     public function getCity($city, $division = null, $country = null)
     {
         $m_city = null;
-        
+
         if (is_array($city) && isset($city['id']) && is_numeric($city['id'])) {
             $m_city = $this->getCityById($city['id']);
         } elseif (is_numeric($city)) {
             $m_city = $this->getCityById($city);
-        } elseif (is_array($city) && isset($city['name']) && ! empty($city['name'])) {
+        } elseif (is_array($city) && isset($city['name']) && !empty($city['name'])) {
             $m_city = $this->getCityByName($city['name'], $division, $country);
-        } elseif (is_string($city) && ! empty($city)) {
+        } elseif (is_string($city) && !empty($city)) {
             $m_city = $this->getCityByName($city, $division, $country);
         }
-        
+
         return $m_city;
     }
 
     /**
-     * Get city by id
+     * Get city by id.
      *
-     * @param integer $city            
+     * @param int $city
      *
      * @return \Address\Model\City
      */
@@ -63,11 +63,11 @@ class City extends AbstractService
     }
 
     /**
-     * Get city id
+     * Get city id.
      *
-     * @param string $city            
-     * @param array|string|integer $division            
-     * @param array|string|integer $country            
+     * @param string           $city
+     * @param array|string|int $division
+     * @param array|string|int $country
      *
      * @return \Address\Model\City
      */
@@ -80,7 +80,7 @@ class City extends AbstractService
                 $country_id = $m_country->getId();
             }
         }
-        
+
         $division_id = null;
         if ($division) {
             $m_division = $this->getServiceDivision()->getDivision($division, $country);
@@ -88,20 +88,20 @@ class City extends AbstractService
                 $division_id = $m_division->getId();
             }
         }
-        
+
         $res_city = $this->getMapper()->getCityByName($city, $division_id, $country_id);
-        
+
         return ($res_city->count() > 0) ? $res_city->current() : $this->add($city, $division_id, $country_id);
     }
 
     /**
-     * Add new city
+     * Add new city.
      *
-     * @param string $city            
-     * @param array|string|integer $country            
-     * @param array|string|integer $division            
-     * @param string $libelle            
-     * @param string $state_long            
+     * @param string           $city
+     * @param array|string|int $country
+     * @param array|string|int $division
+     * @param string           $libelle
+     * @param string           $state_long
      *
      * @return \Address\Model\City
      */
@@ -116,7 +116,7 @@ class City extends AbstractService
                 $country_id = $m_country->getId();
             }
         }
-        
+
         $division_id = null;
         $division_name = '';
         if ($division) {
@@ -126,42 +126,42 @@ class City extends AbstractService
                 $division_id = $m_division->getId();
             }
         }
-        
+
         $m_city = $this->getModel();
         $m_city->setName($city)
             ->setCountryId($country_id)
             ->setDivisionId($division_id)
             ->setLibelle($libelle)
             ->setCode($code);
-        
+
         if (null !== ($LngLat = $this->getLngLat($city, $division_name, $country_name))) {
             $m_city->setLongitude($LngLat['lng'])->setLatitude($LngLat['lat']);
         }
-        
+
         if ($this->getMapper()->insert($m_city) === 0) {
             throw new \Exception('Error: insert city');
         }
-        
+
         return $m_city->setId($this->getMapper()
             ->getLastInsertValue());
     }
 
     /**
-     * Update city
+     * Update city.
      *
-     * @param array $data            
+     * @param array $data
      *
-     * @return integer
+     * @return int
      */
     public function update($data)
     {
-        if (! isset($data['city']['id'])) {
+        if (!isset($data['city']['id'])) {
             return;
         }
-        
+
         $m_city = $this->getModel();
         $m_city->setId($data['city']['id']);
-        
+
         if (isset($data['country'])) {
             $contry = $this->getServiceCountry()->getCountry($data['country']);
             $m_city->setCountryId(($contry) ? $contry->getId() : null);
@@ -179,16 +179,16 @@ class City extends AbstractService
         if (isset($data['city']['libelle'])) {
             $m_city->setLibelle($data['city']['libelle']);
         }
-        
+
         return $this->getMapper()->update($m_city);
     }
 
     /**
-     * Delete city by Id
+     * Delete city by Id.
      *
-     * @param integer $city            
+     * @param int $city
      *
-     * @return integer
+     * @return int
      */
     public function delete($city)
     {
@@ -197,11 +197,11 @@ class City extends AbstractService
     }
 
     /**
-     * Get lng and lat by city division country
+     * Get lng and lat by city division country.
      *
-     * @param stirng $city            
-     * @param string $division            
-     * @param string $country            
+     * @param stirng $city
+     * @param string $division
+     * @param string $country
      *
      * @return array
      */
@@ -213,7 +213,6 @@ class City extends AbstractService
     }
 
     /**
-     *
      * @return \Address\Service\Country
      */
     public function getServiceCountry()
@@ -222,7 +221,6 @@ class City extends AbstractService
     }
 
     /**
-     *
      * @return \Address\Service\Division
      */
     public function getServiceDivision()

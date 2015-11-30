@@ -1,6 +1,6 @@
 <?php
 
-namespace Address\Model\base;
+namespace Address\Model\Base;
 
 use Dal\Model\AbstractModel;
 
@@ -178,16 +178,16 @@ class Address extends AbstractModel
 
         return $this;
     }
-    
+
     public function getTimezone()
     {
-    	return $this->timezone;
+        return $this->timezone;
     }
-    
+
     public function setTimezone($timezone)
     {
-    	$this->timezone = $timezone;
-    
-    	return $this;
+        $this->timezone = $timezone;
+
+        return $this;
     }
 }

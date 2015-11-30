@@ -1,24 +1,23 @@
 <?php
+
 namespace Address\Service;
 
-use Zend\Db\Sql\Predicate\IsNull;
 use Dal\Service\AbstractService;
 use Address\Geoloc\Geoloc;
 
 class Address extends AbstractService
 {
-
     /**
-     * Get address by name or id
+     * Get address by name or id.
      *
-     * @param array|string|integer $address            
+     * @param array|string|int $address
      *
      * @return \Address\Model\Address
      */
     public function getAddress($address)
     {
         $m_address = null;
-        
+
         if (is_array($address) && isset($address['id']) && is_numeric($address['id'])) {
             $m_address = $this->getAddressById($address['id']);
         } elseif (is_numeric($address)) {
@@ -26,14 +25,14 @@ class Address extends AbstractService
         } elseif (is_array($address)) {
             $m_address = $this->getAddressByArray($address);
         }
-        
+
         return $m_address;
     }
 
     /**
-     * Get address by id
+     * Get address by id.
      *
-     * @param integer $address            
+     * @param int $address
      *
      * @return \Address\Model\Address
      */
@@ -43,9 +42,9 @@ class Address extends AbstractService
     }
 
     /**
-     * Get address by array values
+     * Get address by array values.
      *
-     * @param array $address            
+     * @param array $address
      *
      * @return \Address\Model\Address
      */
@@ -72,30 +71,29 @@ class Address extends AbstractService
                 $city_id = $m_city->getId();
             }
         }
-        
+
         $res_address = $this->getMapper()->selectByArray($data, $city_id, $division_id, $country_id);
-        
+
         if ($res_address->count() > 0) {
             $m_address = $res_address->current();
         } else {
-            $street_no = (! empty($data['street_no'])) ? $data['street_no'] : null;
-            $street_type = (! empty($data['street_type'])) ? $data['street_type'] : null;
-            $street_name = (! empty($data['street_name'])) ? $data['street_name'] : null;
-            $floor = (! empty($data['floor'])) ? $data['floor'] : null;
-            $door = (! empty($data['door'])) ? $data['door'] : null;
-            $apartment = (! empty($data['apartment'])) ? $data['apartment'] : null;
-            $building = (! empty($data['building'])) ? $data['building'] : null;
-            $lat = (! empty($data['latitude'])) ? $data['latitude'] : null;
-            $lng = (! empty($data['longitude'])) ? $data['longitude'] : null;
-            
+            $street_no = (!empty($data['street_no'])) ? $data['street_no'] : null;
+            $street_type = (!empty($data['street_type'])) ? $data['street_type'] : null;
+            $street_name = (!empty($data['street_name'])) ? $data['street_name'] : null;
+            $floor = (!empty($data['floor'])) ? $data['floor'] : null;
+            $door = (!empty($data['door'])) ? $data['door'] : null;
+            $apartment = (!empty($data['apartment'])) ? $data['apartment'] : null;
+            $building = (!empty($data['building'])) ? $data['building'] : null;
+            $lat = (!empty($data['latitude'])) ? $data['latitude'] : null;
+            $lng = (!empty($data['longitude'])) ? $data['longitude'] : null;
+
             $m_address = $this->add($street_no, $street_type, $street_name, $floor, $door, $apartment, $building, $city_id, $division_id, $country_id, $lat, $lng);
         }
-        
+
         return $m_address;
     }
 
     /**
-     * 
      * @param unknown $street_no
      * @param unknown $street_type
      * @param unknown $street_name
@@ -106,8 +104,9 @@ class Address extends AbstractService
      * @param unknown $city
      * @param unknown $division
      * @param unknown $country
-     * @param string $lat
-     * @param string $lng
+     * @param string  $lat
+     * @param string  $lng
+     *
      * @throws \Exception
      * 
      * @return \Dal\Model\AbstractModel
@@ -123,7 +122,7 @@ class Address extends AbstractService
                 $country_name = $m_country->getName();
             }
         }
-        
+
         $division_id = null;
         $division_name = '';
         if ($division) {
@@ -133,7 +132,7 @@ class Address extends AbstractService
                 $division_name = $m_division->getName();
             }
         }
-        
+
         $city_id = null;
         $city_name = '';
         if ($city) {
@@ -143,7 +142,7 @@ class Address extends AbstractService
                 $city_name = $m_city->getName();
             }
         }
-        
+
         $m_address = $this->getModel();
         $m_address->setStreetType($street_type)
             ->setStreetName($street_name)
@@ -155,7 +154,7 @@ class Address extends AbstractService
             ->setCityId($city_id)
             ->setDivisionId($division_id)
             ->setCountryId($country_id);
-        
+
         $LngLat = ($lat && $lng) ? ['lat' => $lat,'lng' => $lng] : $this->getLngLat($street_no, $street_type, $street_name, $city_name, $division_name, $country_name);
         if (null !== $LngLat) {
             $m_address->setLongitude($LngLat['lng'])->setLatitude($LngLat['lat']);
@@ -163,21 +162,22 @@ class Address extends AbstractService
                 $m_address->setTimezone(($tmz) ? $tmz['timeZoneId'] : null);
             }
         }
-        
+
         if ($this->getMapper()->insert($m_address) === 0) {
             throw new \Exception('Error: insert city');
         }
-        
+
         $m_address->setId($this->getMapper()
             ->getLastInsertValue());
-        
+
         return $m_address;
     }
 
     /**
-     * Get Address By Id
+     * Get Address By Id.
      *
-     * @param integer $address            
+     * @param int $address
+     *
      * @return \Address\Model\Address\Relational
      */
     public function get($address)
@@ -185,11 +185,11 @@ class Address extends AbstractService
         $m_address = $this->getMapper()
             ->get($address)
             ->current();
-        
-        if (! is_double($m_address->getLatitude()) && ! is_double($m_address->getLongitude())) {
+
+        if (!is_double($m_address->getLatitude()) && !is_double($m_address->getLongitude())) {
             $this->updateLngLatTmz($m_address);
         }
-        
+
         return $m_address;
     }
 
@@ -200,15 +200,14 @@ class Address extends AbstractService
         foreach ($res_addr as $m_address) {
             $ret[$m_address->getId()] = $this->updateLngLatTmz($m_address);
         }
-        
+
         return $ret;
     }
 
     /**
+     * @param \Address\Model\Address $m_address
      *
-     * @param \Address\Model\Address $m_address            
-     *
-     * @return integer
+     * @return int
      */
     public function updateLngLatTmz($m_address)
     {
@@ -219,22 +218,23 @@ class Address extends AbstractService
             if (null !== ($tmz = $this->getServiceGeoloc()->getTimezone($result['lat'], $result['lng']))) {
                 $m_address->setTimezone($tmz['timeZoneId']);
             }
-            
+
             $ret = $this->getMapper()->update($m_address);
         }
-        
+
         return $ret;
     }
 
     /**
-     * Get lng and lat
+     * Get lng and lat.
      *
-     * @param string $street_no            
-     * @param string $street_type            
-     * @param string $street_name            
-     * @param string $city            
-     * @param string $division            
-     * @param string $country            
+     * @param string $street_no
+     * @param string $street_type
+     * @param string $street_name
+     * @param string $city
+     * @param string $division
+     * @param string $country
+     *
      * @return array
      */
     public function getLngLat($street_no, $street_type, $street_name, $city, $division, $country)
@@ -243,7 +243,6 @@ class Address extends AbstractService
     }
 
     /**
-     *
      * @return \Address\Geoloc\Geoloc
      */
     public function getServiceGeoloc()
@@ -252,7 +251,6 @@ class Address extends AbstractService
     }
 
     /**
-     *
      * @return \Address\Service\Country
      */
     public function getServiceCountry()
@@ -261,7 +259,6 @@ class Address extends AbstractService
     }
 
     /**
-     *
      * @return \Address\Service\Division
      */
     public function getServiceDivision()
@@ -270,7 +267,6 @@ class Address extends AbstractService
     }
 
     /**
-     *
      * @return \Address\Service\City
      */
     public function getServiceCity()
