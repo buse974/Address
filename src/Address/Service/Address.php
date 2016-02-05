@@ -155,6 +155,9 @@ class Address extends AbstractService
             ->setDivisionId($division_id)
             ->setCountryId($country_id);
 
+	if(!$m_address->toArrayCurrent()) {
+	    return null;
+	}
         $LngLat = ($lat && $lng) ? ['lat' => $lat,'lng' => $lng] : $this->getLngLat($street_no, $street_type, $street_name, $city_name, $division_name, $country_name);
         if (null !== $LngLat) {
             $m_address->setLongitude($LngLat['lng'])->setLatitude($LngLat['lat']);

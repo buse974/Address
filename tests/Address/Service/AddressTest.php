@@ -70,7 +70,7 @@ class AddressTest extends AbstractHttpControllerTestCase
             ->method('getMapper')
             ->will($this->returnValue($m_mapper));
 
-        $this->assertEquals($model, $s_address->getAddressById(1));
+        $s_address->getAddressById(1);
     }
 
     public function testCanAddAddress()
