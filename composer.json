@@ -12,7 +12,7 @@
     ],
     "require": {
 	"php": ">=5.4",
-    	"buse974/dal":"dev-master",
+    	"buse974/dal":"v1.0-beta-3",
         "zendframework/zendframework": "2.*"
     },
     "require-dev" : {
