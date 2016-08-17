@@ -13,7 +13,7 @@
     "require": {
 	"php": ">=5.4",
     	"buse974/dal":"dev-master",
-        "zendframework/zendframework": "2.*"
+        "zendframework/zendframework": "~2.0||~3.0"
     },
     "require-dev" : {
         "satooshi/php-coveralls": "1.0.0",
