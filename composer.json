@@ -12,8 +12,8 @@
     ],
     "require": {
 	"php": ">=5.4",
-    	"buse974/dal":"v1.0-beta-3",
-        "zendframework/zendframework": "2.*"
+    	"buse974/dal":"~1.0",
+        "zendframework/zendframework": "~2.0"
     },
     "require-dev" : {
         "satooshi/php-coveralls": "1.0.0",
