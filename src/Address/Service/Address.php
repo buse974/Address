@@ -250,7 +250,7 @@ class Address extends AbstractService
      */
     public function getServiceGeoloc()
     {
-        return $this->getServiceLocator()->get('geoloc');
+        return $this->container->get('geoloc');
     }
 
     /**
@@ -258,7 +258,7 @@ class Address extends AbstractService
      */
     public function getServiceCountry()
     {
-        return $this->getServiceLocator()->get('addr_service_country');
+        return $this->container->get('addr_service_country');
     }
 
     /**
@@ -266,7 +266,7 @@ class Address extends AbstractService
      */
     public function getServiceDivision()
     {
-        return $this->getServiceLocator()->get('addr_service_division');
+        return $this->container->get('addr_service_division');
     }
 
     /**
@@ -274,6 +274,6 @@ class Address extends AbstractService
      */
     public function getServiceCity()
     {
-        return $this->getServiceLocator()->get('addr_service_city');
+        return $this->container->get('addr_service_city');
     }
 }

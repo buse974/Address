@@ -139,7 +139,7 @@ class Division extends AbstractService
      */
     public function getLngLat($division, $country = '')
     {
-        return $this->getServiceLocator()
+        return $this->container
             ->get('geoloc')
             ->getLngLat(sprintf('%s %s', $division, $country));
     }
@@ -149,6 +149,6 @@ class Division extends AbstractService
      */
     public function getServiceCountry()
     {
-        return $this->getServiceLocator()->get('addr_service_country');
+        return $this->container->get('addr_service_country');
     }
 }

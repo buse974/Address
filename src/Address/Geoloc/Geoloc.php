@@ -4,7 +4,7 @@ namespace Address\Geoloc;
 
 use Zend\Http\Client;
 
-class Geoloc implements \Zend\ServiceManager\ServiceLocatorAwareInterface
+class Geoloc
 {
     const STATUS_OK = 'OK';
 
@@ -29,7 +29,17 @@ class Geoloc implements \Zend\ServiceManager\ServiceLocatorAwareInterface
     protected $params_timezone = array('location' => null,'timestamp' => 0);
 
     protected $output_format = 'json';
+    
+    protected $options;
+    
+    protected $adapter;
 
+    public function __construct($options, $adapter) 
+    {
+        $this->adapter = $adapter;
+        $this->options = $options;
+    }
+    
     /**
      * Get lng lat by address.
      *
@@ -93,7 +103,7 @@ class Geoloc implements \Zend\ServiceManager\ServiceLocatorAwareInterface
     {
         $this->params_location['address'] = urlencode($address);
 
-        return $this->getServiceLocator()->get('config')['address-conf']['geoloc']['url'].$this->api_location.'/'.$this->output_format.'?'.$this->arrayToString($this->params_location);
+        return $this->options['geoloc']['url'].$this->api_location.'/'.$this->output_format.'?'.$this->arrayToString($this->params_location);
     }
 
     /**
@@ -105,42 +115,14 @@ class Geoloc implements \Zend\ServiceManager\ServiceLocatorAwareInterface
     {
         $this->params_timezone['location'] = sprintf('%s,%s', $latitude, $longitude);
 
-        return $this->getServiceLocator()->get('config')['address-conf']['geoloc']['url'].$this->api_timezone.'/'.$this->output_format.'?'.$this->arrayToString($this->params_timezone);
-    }
-
-    /**
-     * Set service locator.
-     *
-     * @param ServiceLocatorInterface $serviceLocator
-     */
-    public function setServiceLocator(\Zend\ServiceManager\ServiceLocatorInterface $serviceLocator)
-    {
-        if ($this->serviceLocator === null) {
-            $this->serviceLocator = $serviceLocator;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Get service locator.
-     *
-     * @return ServiceLocatorInterface
-     */
-    public function getServiceLocator()
-    {
-        return $this->serviceLocator;
+        return $this->options['geoloc']['url'].$this->api_timezone.'/'.$this->output_format.'?'.$this->arrayToString($this->params_timezone);
     }
 
     public function send($url)
     {
-        $conf = $this->getServiceLocator()->get('config');
-        $conf_addr = $conf['address-conf'];
         $cli = $this->getClient();
-        $cli->setOptions($conf[$conf_addr['geoloc']['adapter']]);
         $cli->setUri($url);
         $ret = $cli->send();
-
         if ($ret->isClientError()) {
             return;
         }
@@ -148,8 +130,15 @@ class Geoloc implements \Zend\ServiceManager\ServiceLocatorAwareInterface
         return json_decode($ret->getBody(), true);
     }
 
+    /**
+     * 
+     * @return \Zend\Http\Client
+     */
     public function getClient()
     {
-        return new Client();
+        $client = new Client();
+        $client->setOptions($this->adapter);
+        
+        return $client;
     }
 }

@@ -4,6 +4,7 @@ return array(
     'modules' => array(
         'Address',
         'Dal',
+        'Zend\Router',
     ),
     'module_listener_options' => array(
         'module_paths' => array(

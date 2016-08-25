@@ -177,7 +177,10 @@ class DivisionTest extends AbstractHttpControllerTestCase
     public function testCanAddDivision()
     {
         // Mock country
-        $mockconutry = $this->getMock('\Object', ['getName', 'getId']);
+        $mockconutry = $this->getMockBuilder('stdClass')
+            ->setMethods(['getName', 'getId'])
+            ->getMock();
+        
         $mockconutry->expects($this->once())
             ->method('getId')
             ->will($this->returnValue(12));
@@ -250,18 +253,19 @@ class DivisionTest extends AbstractHttpControllerTestCase
     public function testGetLngLat()
     {
         // Mock country
-        $mock = $this->getMock('geoloc', ['getLngLat']);
+        $mock = $this->getMockBuilder('Address\Geoloc\Geoloc')
+            ->setMethods(['getLngLat'])
+            ->setConstructorArgs([[],[]])
+            ->getMock();
+        
         $mock->expects($this->once())
             ->method('GetLngLat')
             ->with($this->equalTo('tata titi'))
             ->will($this->returnValue('ok'));
 
-        $s_division = $this->getMockServiceDivision(['getServiceLocator', 'get']);
-
-        $s_division->expects($this->any())
-            ->method('getServiceLocator')
-            ->will($this->returnSelf());
-
+        $s_division = $this->getMockServiceDivision(['get']);
+        $s_division->setContainer($s_division);
+        
         $s_division->expects($this->exactly(1))
             ->method('get')
             ->will($this->returnValue($mock));
@@ -272,12 +276,11 @@ class DivisionTest extends AbstractHttpControllerTestCase
     public function getMockServiceDivision(array $methods = [])
     {
         $s_address = $this->getMockBuilder('\Address\Service\Division')
-        ->setConstructorArgs([['prefix' => 'addr', 'name' => 'division']])
-        ->setMethods($methods)
-        ->getMock();
+            ->setConstructorArgs([['prefix' => 'addr', 'name' => 'division']])
+            ->setMethods($methods)
+            ->getMock();
 
-        $s_address->setServiceLocator($this->getApplication()
-            ->getServiceManager());
+        $s_address->setContainer($this->getApplicationServiceLocator());
 
         return $s_address;
     }

@@ -4,6 +4,7 @@ namespace Address;
 
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
+use Address\Geoloc\Geoloc;
 
 class Module implements ConfigProviderInterface
 {
@@ -32,5 +33,19 @@ class Module implements ConfigProviderInterface
         }
 
         return $this->config = $serviceLocator->get('Config')[$this->config_name];
+    }
+    
+    public function getServiceConfig()
+    {
+        return [
+            'factories' => [
+                'geoloc' => function ($container, $requestedName, $options) {
+                    $conf = $container->get('config');
+                    $conf_addr = $conf['address-conf'];
+                
+                    return new Geoloc($conf_addr, $conf[$conf_addr['geoloc']['adapter']]);
+                },
+            ],
+        ];
     }
 }

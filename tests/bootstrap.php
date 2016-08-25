@@ -39,9 +39,12 @@ class bootstrap
             ),
         ));
 
-        $serviceManager = new ServiceManager(new ServiceManagerConfig());
+        $smConfig = new ServiceManagerConfig([]);
+        $serviceManager = new ServiceManager();
+        $smConfig->configureServiceManager($serviceManager);
         $serviceManager->setService('ApplicationConfig', include __DIR__.'/config/application.config.php');
         $serviceManager->get('ModuleManager')->loadModules();
+        
         static::$serviceManager = $serviceManager;
     }
 

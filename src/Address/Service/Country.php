@@ -99,7 +99,7 @@ class Country extends AbstractService
      */
     public function getLngLat($country)
     {
-        return $this->getServiceLocator()
+        return $this->container
             ->get('geoloc')
             ->getLngLat($country);
     }
