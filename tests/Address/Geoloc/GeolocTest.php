@@ -74,8 +74,7 @@ class GeolocTest extends AbstractHttpControllerTestCase
 
     public function testArrayToString()
     {
-        $serviceManager = $this->getApplication()->getServiceManager();
-        $geoloc = $serviceManager->get('geoloc');
+        $geoloc = $this->getMockServiceGeoloc();
 
         $reflectionClass = new \ReflectionClass('Address\Geoloc\Geoloc');
         $reflection = $reflectionClass->getMethod('arrayToString');
@@ -86,9 +85,8 @@ class GeolocTest extends AbstractHttpControllerTestCase
 
     public function testGetUrlApiLocation()
     {
-        $serviceManager = $this->getApplication()->getServiceManager();
-        $geoloc = $serviceManager->get('geoloc');
-
+        $geoloc = $geoloc = $this->getMockServiceGeoloc();
+        
         $reflectionClass = new \ReflectionClass('Address\Geoloc\Geoloc');
         $reflection = $reflectionClass->getMethod('getUrlApiLocation');
         $reflection->setAccessible(true);
@@ -98,9 +96,8 @@ class GeolocTest extends AbstractHttpControllerTestCase
 
     public function testGetUrlApiTimezone()
     {
-        $serviceManager = $this->getApplication()->getServiceManager();
-        $geoloc = $serviceManager->get('geoloc');
-
+        $geoloc = $geoloc = $this->getMockServiceGeoloc();
+        
         $reflectionClass = new \ReflectionClass('Address\Geoloc\Geoloc');
         $reflection = $reflectionClass->getMethod('getUrlApiTimezone');
         $reflection->setAccessible(true);
@@ -112,23 +109,22 @@ class GeolocTest extends AbstractHttpControllerTestCase
     {
         $ar = ['adapter' => [],'address-conf' => ['geoloc' => ['adapter' => 'adapter']]];
 
-        $geoloc = $this->getMockServiceGeoloc(['getServiceLocator', 'get', 'getClient']);
-        $client = $this->getMock('client', ['setOptions', 'setUri', 'send', 'isClientError', 'getBody']);
+        $geoloc = $this->getMockServiceGeoloc(['get', 'getClient']);
+        $client = $this->getMockBuilder('stdClass')->setMethods(['setOptions', 'setUri', 'send', 'isClientError', 'getBody'])->getMock();
 
-        $geoloc->expects($this->any())
-            ->method('getServiceLocator')
-            ->will($this->returnSelf());
         $geoloc->expects($this->any())
             ->method('get')
             ->will($this->returnValue($ar));
         $geoloc->expects($this->any())
             ->method('getClient')
             ->will($this->returnValue($client));
-
+  
         $client->expects($this->any())
             ->method('send')
             ->will($this->returnSelf());
-
+        $client->expects($this->any())
+            ->method('setUri')
+            ->will($this->returnSelf());
         $client->expects($this->any())
             ->method('isClientError')
             ->will($this->returnValue(1));
@@ -144,7 +140,7 @@ class GeolocTest extends AbstractHttpControllerTestCase
         $ar = ['adapter' => [],'address-conf' => ['geoloc' => ['adapter' => 'adapter']]];
 
         $geoloc = $this->getMockServiceGeoloc(['getServiceLocator', 'get', 'getClient']);
-        $client = $this->getMock('client', ['setOptions', 'setUri', 'send', 'isClientError', 'getBody']);
+        $client = $this->getMockBuilder('stdClass')->setMethods(['setOptions', 'setUri', 'send', 'isClientError', 'getBody'])->getMock();
 
         $geoloc->expects($this->any())
             ->method('getServiceLocator')
@@ -159,7 +155,9 @@ class GeolocTest extends AbstractHttpControllerTestCase
         $client->expects($this->any())
             ->method('send')
             ->will($this->returnSelf());
-
+        $client->expects($this->any())
+            ->method('setUri')
+            ->will($this->returnSelf());
         $client->expects($this->any())
             ->method('isClientError')
             ->will($this->returnValue(null));
@@ -172,19 +170,22 @@ class GeolocTest extends AbstractHttpControllerTestCase
 
     public function testGetClient()
     {
-        $geoloc = new \Address\Geoloc\Geoloc();
+        
+        $geoloc = new \Address\Geoloc\Geoloc([],[]);
 
         $this->assertInstanceOf("Zend\Http\Client", $geoloc->getClient());
     }
 
     public function getMockServiceGeoloc(array $methods = [])
     {
+        $container  = $this->getApplicationServiceLocator();
+        $conf = $container->get('config');
+        $conf_addr = $conf['address-conf'];
+        
         $geoloc = $this->getMockBuilder('\Address\Geoloc\Geoloc')
             ->setMethods($methods)
+            ->setConstructorArgs([$conf_addr, []])
             ->getMock();
-
-        $geoloc->setServiceLocator($this->getApplication()
-            ->getServiceManager());
 
         return $geoloc;
     }

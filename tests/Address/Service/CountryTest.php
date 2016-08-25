@@ -144,8 +144,7 @@ class CountryTest extends AbstractHttpControllerTestCase
             ->method('getMapper')
             ->will($this->returnValue($m_mapper));
 
-        $s_country->setServiceLocator($this->getApplication()
-            ->getServiceManager());
+        $s_country->setContainer($this->getApplicationServiceLocator());
 
         $this->assertEquals('result', $s_country->getCountryByName('france'));
     }
@@ -183,8 +182,7 @@ class CountryTest extends AbstractHttpControllerTestCase
             ->method('getMapper')
             ->will($this->returnValue($m_mapper));
 
-        $s_country->setServiceLocator($this->getApplication()
-            ->getServiceManager());
+        $s_country->setContainer($this->getApplicationServiceLocator());
 
         $this->assertInstanceOf('\Address\Model\base\Country', $s_country->getCountryByName('france'));
     }
@@ -218,8 +216,7 @@ class CountryTest extends AbstractHttpControllerTestCase
             ->method('getMapper')
             ->will($this->returnValue($m_mapper));
 
-        $s_country->setServiceLocator($this->getApplication()
-            ->getServiceManager());
+        $s_country->setContainer($this->getApplicationServiceLocator());
 
         $s_country->getCountryByName('france');
     }
@@ -227,18 +224,19 @@ class CountryTest extends AbstractHttpControllerTestCase
     public function testGetLngLat()
     {
         // Mock country
-        $mock = $this->getMock('geoloc', ['getLngLat']);
+        $mock = $this->getMockBuilder('Address\Geoloc\Geoloc')
+            ->setMethods(['getLngLat'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        
         $mock->expects($this->once())
             ->method('GetLngLat')
             ->with($this->equalTo('tata'))
             ->will($this->returnValue('ok'));
 
-        $s_division = $this->getMockServiceCountry(['getServiceLocator', 'get']);
-
-        $s_division->expects($this->any())
-            ->method('getServiceLocator')
-            ->will($this->returnSelf());
-
+        $s_division = $this->getMockServiceCountry(['get']);
+        $s_division->setContainer($s_division);
+        
         $s_division->expects($this->exactly(1))
             ->method('get')
             ->will($this->returnValue($mock));
@@ -253,8 +251,7 @@ class CountryTest extends AbstractHttpControllerTestCase
             ->setMethods($methods)
             ->getMock();
 
-        $s_country->setServiceLocator($this->getApplication()
-            ->getServiceManager());
+        $s_country->setContainer($this->getApplicationServiceLocator());
 
         return $s_country;
     }

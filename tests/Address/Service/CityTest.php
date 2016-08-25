@@ -187,12 +187,20 @@ class CityTest extends AbstractHttpControllerTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $m_division = $this->getMock('division', ['getId']);
+        $m_division = $this->getMockBuilder('Address\Service\Division')
+            ->setMethods(['getId'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        
         $m_division->expects($this->once())
             ->method('getId')
             ->will($this->returnValue(2));
 
-        $m_country = $this->getMock('country', ['getId']);
+        $m_country = $this->getMockBuilder('Address\Service\Country')
+            ->setMethods(['getId'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        
         $m_country->expects($this->once())
             ->method('getId')
             ->will($this->returnValue(4));
@@ -227,10 +235,14 @@ class CityTest extends AbstractHttpControllerTestCase
 
     public function testCanAddCity()
     {
-        $serviceManager = $this->getApplication()->getServiceManager();
+        $container = $this->getApplicationServiceLocator();
 
         // Mock country
-        $mockconutry = $this->getMock('\Object', ['getName', 'getId']);
+        $mockconutry = $this->getMockBuilder('stdClass')
+            ->setMethods(['getName', 'getId'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        
         $mockconutry->expects($this->once())
             ->method('getId')
             ->will($this->returnValue(12));
@@ -240,7 +252,11 @@ class CityTest extends AbstractHttpControllerTestCase
             ->will($this->returnValue('countryname'));
 
         // Mock division
-        $mockdivision = $this->getMock('\Object', ['getName', 'getId']);
+        $mockdivision = $this->getMockBuilder('stdClass')
+            ->setMethods(['getName', 'getId'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $mockdivision->expects($this->once())
             ->method('getId')
             ->will($this->returnValue(12));
@@ -286,8 +302,9 @@ class CityTest extends AbstractHttpControllerTestCase
             ->method('insert')
             ->will($this->returnValue(1));
 
-        $s_city->setServiceLocator($serviceManager);
-
+        $s_city->setContainer($container);
+            
+        
         $m_city = $s_city->add('city', 'division', 'country', 'short', '13000');
 
         $this->assertInstanceOf('\Address\Model\base\City', $m_city);
@@ -303,21 +320,29 @@ class CityTest extends AbstractHttpControllerTestCase
 
     public function testCanUpdateCity()
     {
+        $container = $this->getApplicationServiceLocator();
+        
         $data = ['city' => ['id' => 1,'name' => 'marseille','code' => 13000,'libelle' => 'libelle'],'country' => [],'division' => []];
 
         //Mapper
-        $mockmapper = $this->getMock('\Object', ['update']);
+        $mockmapper = $this->getMockBuilder('stdClass')
+            ->setMethods(['update'])
+            ->getMock();
         $mockmapper->expects($this->once())
             ->method('update')
             ->will($this->returnValue(1));
 
         //Mock country
-        $mockconutry = $this->getMock('\Object', ['getId']);
+        $mockconutry = $this->getMockBuilder('stdClass')
+            ->setMethods(['getId'])
+            ->getMock();
         $mockconutry->expects($this->once())
             ->method('getId');
 
         //Mock division
-        $mockdivision = $this->getMock('\Object', ['getId']);
+        $mockdivision = $this->getMockBuilder('stdClass')
+            ->setMethods(['getId'])
+            ->getMock();
         $mockdivision->expects($this->once())
             ->method('getId');
 
@@ -346,8 +371,7 @@ class CityTest extends AbstractHttpControllerTestCase
             ->method('getDivision')
             ->will($this->returnValue($mockdivision));
 
-        $s_city->setServiceLocator($this->getApplication()
-            ->getServiceManager());
+        $s_city->setContainer($container);
 
         $this->assertEquals(1, $s_city->update($data));
     }
@@ -355,7 +379,10 @@ class CityTest extends AbstractHttpControllerTestCase
     public function testCanDeleteCity()
     {
         // Mapper
-        $mockmapper = $this->getMock('\Object', ['delete']);
+        $mockmapper = $this->getMockBuilder('stdClass')
+            ->setMethods(['delete'])
+            ->getMock();
+        
         $mockmapper->expects($this->once())
             ->method('delete')
             ->will($this->returnValue(1));
@@ -369,8 +396,7 @@ class CityTest extends AbstractHttpControllerTestCase
             ->method('getMapper')
             ->will($this->returnValue($mockmapper));
 
-        $s_city->setServiceLocator($this->getApplication()
-            ->getServiceManager());
+        $s_city->setContainer($this->getApplicationServiceLocator());
 
         $this->assertEquals(1, $s_city->delete(1));
     }
@@ -391,7 +417,7 @@ class CityTest extends AbstractHttpControllerTestCase
     {
         $this->setExpectedException('Exception', 'Error: insert city', 0);
 
-        $serviceManager = $this->getApplication()->getServiceManager();
+        $container = $this->getApplicationServiceLocator();
 
         $s_city = $this->getMockBuilder('\Address\Service\City')
             ->setConstructorArgs([['prefix' => 'addr', 'name' => 'city']])
@@ -410,7 +436,7 @@ class CityTest extends AbstractHttpControllerTestCase
             ->method('insert')
             ->will($this->returnValue(0));
 
-        $s_city->setServiceLocator($serviceManager);
+        $s_city->setContainer($container);
 
         $s_city->add('city');
     }
@@ -418,25 +444,30 @@ class CityTest extends AbstractHttpControllerTestCase
     public function testGetLngLat()
     {
         // Mock country
-        $mock = $this->getMock('geoloc', ['getLngLat']);
-        $mock->expects($this->once())
+        $mock = $this->getMockBuilder('Address\Geoloc\Geoloc')
+            ->setMethods(['getLngLat', 'get'])
+            ->setConstructorArgs([[],[]])
+            ->getMock();
+        
+        $mock->expects($this->any())
             ->method('GetLngLat')
             ->with($this->equalTo('tata titi tutu'))
             ->will($this->returnValue('ok'));
+        
+        $mock->expects($this->any())
+            ->method('get')
+            ->will($this->returnSelf());
 
         $s_city = $this->getMockBuilder('\Address\Service\City')
             ->setConstructorArgs([['prefix' => 'addr', 'name' => 'division']])
             ->setMethods(['getServiceLocator', 'get'])
             ->getMock();
-
-        $s_city->expects($this->any())
-            ->method('getServiceLocator')
-            ->will($this->returnSelf());
-
-        $s_city->expects($this->exactly(1))
-            ->method('get')
-            ->will($this->returnValue($mock));
-
+        
+        $class = new \ReflectionClass('\Address\Service\City');
+        $property = $class->getProperty("container");
+        $property->setAccessible(true);
+        $property->setValue($s_city, $mock);
+            
         $this->assertEquals('ok', $s_city->getLngLat('tata', 'titi', 'tutu'));
     }
 

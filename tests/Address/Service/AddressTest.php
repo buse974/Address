@@ -48,11 +48,11 @@ class AddressTest extends AbstractHttpControllerTestCase
 
     public function testGetAddressById()
     {
-        $model = $this->getMockBuilder('model')
+        $model = $this->getMockBuilder('stdClass')
             ->setMethods(array('getLatitude', 'getLongitude'))
             ->getMock();
 
-        $m_mapper = $this->getMockBuilder('mapper')
+        $m_mapper = $this->getMockBuilder('stdClass')
             ->setMethods(array('get', 'current'))
             ->getMock();
 
@@ -78,7 +78,7 @@ class AddressTest extends AbstractHttpControllerTestCase
         $data = ['street_name' => 'street_name','street_no' => 'street_no','street_type' => 'street_type','floor' => 'floor','door' => 'door','apartment' => 'apartment','building' => 'building','longitude' => 88,'latitude' => 77,'city' => [],'country' => [],'division' => []];
 
         // Mapper
-        $m_mapper = $this->getMockBuilder('mapper')
+        $m_mapper = $this->getMockBuilder('stdClass')
             ->setMethods(array('selectByArray', 'current', 'count', 'insert', 'getLastInsertValue'))
             ->getMock();
 
@@ -91,15 +91,15 @@ class AddressTest extends AbstractHttpControllerTestCase
             ->will($this->returnValue(0));
 
         // Mock city
-        $mockcity = $this->getMock('city', ['getId', 'getName']);
+        $mockcity = $this->getMockBuilder('Address\Service\City')->setMethods(['getId', 'getName'])->getMock();
         $mockcity->expects($this->any())
             ->method('getId')
             ->will($this->returnValue(1));
-        $mockconutry = $this->getMock('country', ['getId', 'getName']);
+        $mockconutry = $this->getMockBuilder('Address\Service\Country')->setMethods(['getId', 'getName'])->getMock();  
         $mockconutry->expects($this->any())
             ->method('getId')
             ->will($this->returnValue(3));
-        $mockdivision = $this->getMock('division', ['getId', 'getName']);
+        $mockdivision = $this->getMockBuilder('Address\Service\Division')->setMethods(['getId', 'getName'])->getMock();  
         $mockdivision->expects($this->any())
             ->method('getId')
             ->will($this->returnValue(2));
@@ -206,92 +206,27 @@ class AddressTest extends AbstractHttpControllerTestCase
     public function testGetLngLat()
     {
         // Mock country
-        $mock = $this->getMock('geoloc', ['getLngLat']);
+        $mock = $this->getMockBuilder('Address\Geoloc\Geoloc')
+            ->setMethods(['getLngLat'])
+            ->setConstructorArgs([[],[]])->getMock();
+
         $mock->expects($this->once())
             ->method('GetLngLat')
             ->with($this->equalTo('num type name city country division'))
             ->will($this->returnValue('ok'));
 
-        $s_address = $this->getMockServiceAddress(['getServiceLocator', 'get']);
-
-        $s_address->expects($this->any())
-            ->method('getServiceLocator')
-            ->will($this->returnSelf());
-
+        $s_address = $this->getMockServiceAddress(['getServiceGeoloc']);
         $s_address->expects($this->exactly(1))
-            ->method('get')
+            ->method('getServiceGeoloc')
             ->will($this->returnValue($mock));
 
         $this->assertEquals('ok', $s_address->getLngLat('num', 'type', 'name', 'city', 'country', 'division'));
     }
 
-    public function testGetServiceCountry()
-    {
-        $s_address = $this->getMockServiceAddress(['getServiceLocator', 'get']);
-
-        $s_address->expects($this->any())
-            ->method('getServiceLocator')
-            ->will($this->returnSelf());
-
-        $s_address->expects($this->exactly(1))
-            ->method('get')
-            ->with($this->equalTo('addr_service_country'))
-            ->will($this->returnValue('addr_service_country'));
-
-        $this->assertEquals('addr_service_country', $s_address->getServiceCountry());
-    }
-
-    public function testGetServiceCity()
-    {
-        $s_address = $this->getMockServiceAddress(['getServiceLocator', 'get']);
-
-        $s_address->expects($this->any())
-            ->method('getServiceLocator')
-            ->will($this->returnSelf());
-
-        $s_address->expects($this->exactly(1))
-            ->method('get')
-            ->with($this->equalTo('addr_service_city'))
-            ->will($this->returnValue('addr_service_city'));
-
-        $this->assertEquals('addr_service_city', $s_address->getServiceCity());
-    }
-
-    public function testServiceGetgeoloc()
-    {
-        $s_address = $this->getMockServiceAddress(['getServiceLocator', 'get']);
-
-        $s_address->expects($this->any())
-            ->method('getServiceLocator')
-            ->will($this->returnSelf());
-
-        $s_address->expects($this->exactly(1))
-            ->method('get')
-            ->with($this->equalTo('geoloc'))
-            ->will($this->returnValue('geoloc'));
-
-        $this->assertEquals('geoloc', $s_address->getServiceGeoloc());
-    }
-
-    public function testGetServiceDivision()
-    {
-        $s_address = $this->getMockServiceAddress(['getServiceLocator', 'get']);
-
-        $s_address->expects($this->any())
-            ->method('getServiceLocator')
-            ->will($this->returnSelf());
-
-        $s_address->expects($this->exactly(1))
-            ->method('get')
-            ->with($this->equalTo('addr_service_division'))
-            ->will($this->returnValue('addr_service_division'));
-
-        $this->assertEquals('addr_service_division', $s_address->getServiceDivision());
-    }
-
     public function testCanInitLngLat()
     {
-        $m_address = $this->getMock('address', ['getId']);
+        $m_address = $this->getMockServiceAddress(['getId']);
+        
         $m_address->expects($this->any())
             ->method('getId')
             ->will($this->returnValue(1));
@@ -342,15 +277,18 @@ class AddressTest extends AbstractHttpControllerTestCase
         $this->assertEquals('timeZoneId', $m_address->getTimezone());
     }
 
+    /**
+     * @param array $methods
+     * @return PHPUnit_Framework_MockObject_MockObject
+     */
     public function getMockServiceAddress(array $methods = [])
     {
         $s_address = $this->getMockBuilder('\Address\Service\Address')
-            ->setConstructorArgs([['prefix' => 'addr', 'name' => 'address']])
+            ->setConstructorArgs([['prefix' => 'addr', 'name' => 'address']])       
             ->setMethods($methods)
             ->getMock();
 
-        $s_address->setServiceLocator($this->getApplication()
-            ->getServiceManager());
+        $s_address->setContainer($this->getApplicationServiceLocator());
 
         return $s_address;
     }

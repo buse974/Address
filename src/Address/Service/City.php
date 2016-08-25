@@ -207,7 +207,7 @@ class City extends AbstractService
      */
     public function getLngLat($city, $division = '', $country = '')
     {
-        return $this->getServiceLocator()
+        return $this->container
             ->get('geoloc')
             ->getLngLat(sprintf('%s %s %s', $city, $division, $country));
     }
@@ -217,7 +217,7 @@ class City extends AbstractService
      */
     public function getServiceCountry()
     {
-        return $this->getServiceLocator()->get('addr_service_country');
+        return $this->container->get('addr_service_country');
     }
 
     /**
@@ -225,6 +225,6 @@ class City extends AbstractService
      */
     public function getServiceDivision()
     {
-        return $this->getServiceLocator()->get('addr_service_division');
+        return $this->container->get('addr_service_division');
     }
 }

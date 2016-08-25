@@ -45,8 +45,10 @@ class AddressTest extends AbstractHttpControllerTestCase
 
     public function getMockMapperAddress()
     {
-        $select = $this->getMock("Zend\Db\Sql\Select", ['columns', 'join', 'where']);
-
+        $select = $this->getMockBuilder('Dal\Db\Sql\Select')
+            ->setMethods(['columns', 'join', 'where'])
+            ->getMock();
+        
         $select->expects($this->once())
             ->method('columns')
             ->will($this->returnSelf());
@@ -71,8 +73,11 @@ class AddressTest extends AbstractHttpControllerTestCase
             ->method('select')
             ->will($this->returnValue($select));
 
-        $addr = $this->getMock("\Address\Mapper\Address", ['selectWith'], [$table]);
-
+        $addr = $this->getMockBuilder('Address\Mapper\Address')
+            ->setConstructorArgs([$table])
+            ->setMethods(['selectWith'])
+            ->getMock();
+       
         $addr->expects($this->once())
             ->method('selectWith')
             ->with($this->equalTo($select))
