@@ -20,6 +20,7 @@ class Address extends AbstractModel
     protected $longitude;
     protected $latitude;
     protected $timezone;
+    protected $full_address;
 
     protected $prefix = 'address';
 
@@ -187,6 +188,18 @@ class Address extends AbstractModel
     public function setTimezone($timezone)
     {
         $this->timezone = $timezone;
+
+        return $this;
+    }
+
+    public function getFullAddress()
+    {
+        return $this->full_address;
+    }
+
+    public function setFullAddress($full_address)
+    {
+        $this->full_address = $full_address;
 
         return $this;
     }

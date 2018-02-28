@@ -14,7 +14,7 @@ class Address extends AbstractMapper
     public function get($address)
     {
         $select = $this->tableGateway->getSql()->select();
-        $select->columns(array('id', 'street_no', 'street_type', 'street_name', 'floor', 'door', 'apartment', 'building', 'longitude', 'latitude', 'timezone'))
+        $select->columns(array('id', 'street_no', 'street_type', 'street_name', 'floor', 'door', 'apartment', 'building', 'longitude', 'latitude', 'timezone', 'full_address'))
             ->join('city', 'city.id=address.city_id', array('id', 'name', 'libelle', 'code', 'longitude', 'latitude'), $select::JOIN_LEFT)
             ->join('division', 'division.id=address.division_id', array('id', 'name', 'short_name', 'code'), $select::JOIN_LEFT)
             ->join('country', 'country.id=address.country_id', array('id', 'short_name', 'name'), $select::JOIN_LEFT)
@@ -31,7 +31,7 @@ class Address extends AbstractMapper
     public function selectByArray($address, $city = null, $division = null, $country = null)
     {
         $select = $this->tableGateway->getSql()->select();
-        $select->columns(array('id', 'street_no', 'street_type', 'street_name', 'floor', 'door', 'apartment', 'building', 'longitude', 'latitude', 'timezone'))
+        $select->columns(array('id', 'street_no', 'street_type', 'street_name', 'floor', 'door', 'apartment', 'building', 'longitude', 'latitude', 'timezone', 'full_address'))
             ->join('city', 'city.id=address.city_id', array('id', 'name', 'libelle', 'code', 'longitude', 'latitude'), $select::JOIN_LEFT)
             ->join('division', 'division.id=address.division_id', array('id', 'name', 'short_name', 'code'), $select::JOIN_LEFT)
             ->join('country', 'country.id=address.country_id', array('id', 'short_name', 'name'), $select::JOIN_LEFT);
@@ -98,7 +98,7 @@ class Address extends AbstractMapper
     public function getList()
     {
         $select = $this->tableGateway->getSql()->select();
-        $select->columns(array('id', 'street_no', 'street_type', 'street_name', 'floor', 'door', 'apartment', 'building', 'longitude', 'latitude', 'timezone'))
+        $select->columns(array('id', 'street_no', 'street_type', 'street_name', 'floor', 'door', 'apartment', 'building', 'longitude', 'latitude', 'timezone', 'full_address'))
             ->join('city', 'city.id=address.city_id', array('id', 'name', 'libelle', 'code', 'longitude', 'latitude'), $select::JOIN_LEFT)
             ->join('division', 'division.id=address.division_id', array('id', 'name', 'short_name', 'code'), $select::JOIN_LEFT)
             ->join('country', 'country.id=address.country_id', array('id', 'short_name', 'name'), $select::JOIN_LEFT);
