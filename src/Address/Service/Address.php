@@ -106,12 +106,13 @@ class Address extends AbstractService
      * @param unknown $country
      * @param string  $lat
      * @param string  $lng
+     * @param string  $full_address
      *
      * @throws \Exception
      * 
      * @return \Dal\Model\AbstractModel
      */
-    public function add($street_no, $street_type, $street_name, $floor, $door, $apartment, $building, $city = null, $division = null, $country = null, $lat = null, $lng = null)
+    public function add($street_no, $street_type, $street_name, $floor, $door, $apartment, $building, $city = null, $division = null, $country = null, $lat = null, $lng = null, $full_address = null)
     {
         $country_id = null;
         $country_name = '';
@@ -142,7 +143,7 @@ class Address extends AbstractService
                 $city_name = $m_city->getName();
             }
         }
-
+        
         $m_address = $this->getModel();
         $m_address->setStreetType($street_type)
             ->setStreetName($street_name)
@@ -153,7 +154,8 @@ class Address extends AbstractService
             ->setBuilding($building)
             ->setCityId($city_id)
             ->setDivisionId($division_id)
-            ->setCountryId($country_id);
+            ->setCountryId($country_id)
+            ->setFullAddress($full_address);
 
 	if(!$m_address->toArrayCurrent()) {
 	    return null;
