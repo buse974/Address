@@ -36,6 +36,11 @@ class Address extends AbstractMapper
             ->join('division', 'division.id=address.division_id', array('id', 'name', 'short_name', 'code'), $select::JOIN_LEFT)
             ->join('country', 'country.id=address.country_id', array('id', 'short_name', 'name'), $select::JOIN_LEFT);
 
+        if (!empty($address['full_address'])) {
+            $select->where(array('address.full_address' => $address['full_address']));
+        } else {
+            $select->where(array('address.full_address IS NULL'));
+        }
         if (!empty($address['street_no'])) {
             $select->where(array('address.street_no' => $address['street_no']));
         } else {
