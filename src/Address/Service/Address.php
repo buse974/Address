@@ -86,8 +86,9 @@ class Address extends AbstractService
             $building = (!empty($data['building'])) ? $data['building'] : null;
             $lat = (!empty($data['latitude'])) ? $data['latitude'] : null;
             $lng = (!empty($data['longitude'])) ? $data['longitude'] : null;
+            $full_address = (!empty($data['full_address'])) ? $data['full_address'] : null;
 
-            $m_address = $this->add($street_no, $street_type, $street_name, $floor, $door, $apartment, $building, $city_id, $division_id, $country_id, $lat, $lng);
+            $m_address = $this->add($street_no, $street_type, $street_name, $floor, $door, $apartment, $building, $city_id, $division_id, $country_id, $lat, $lng, $full_address);
         }
 
         return $m_address;
