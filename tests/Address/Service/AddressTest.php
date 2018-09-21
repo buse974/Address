@@ -279,7 +279,7 @@ class AddressTest extends AbstractHttpControllerTestCase
 
     /**
      * @param array $methods
-     * @return PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit_Framework_MockObject_MockObject
      */
     public function getMockServiceAddress(array $methods = [])
     {

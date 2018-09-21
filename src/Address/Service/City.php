@@ -11,7 +11,7 @@ class City extends AbstractService
      *
      * @param array $filter
      *
-     * @return \Dal\Db\ResultSet
+     * @return \Dal\Db\ResultSet\ResultSet
      */
     public function getList(array $filter = array())
     {
@@ -199,7 +199,7 @@ class City extends AbstractService
     /**
      * Get lng and lat by city division country.
      *
-     * @param stirng $city
+     * @param string $city
      * @param string $division
      * @param string $country
      *

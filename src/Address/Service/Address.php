@@ -3,7 +3,6 @@
 namespace Address\Service;
 
 use Dal\Service\AbstractService;
-use Address\Geoloc\Geoloc;
 
 class Address extends AbstractService
 {
@@ -95,16 +94,16 @@ class Address extends AbstractService
     }
 
     /**
-     * @param unknown $street_no
-     * @param unknown $street_type
-     * @param unknown $street_name
-     * @param unknown $floor
-     * @param unknown $door
-     * @param unknown $apartment
-     * @param unknown $building
-     * @param unknown $city
-     * @param unknown $division
-     * @param unknown $country
+     * @param string $street_no
+     * @param string $street_type
+     * @param string $street_name
+     * @param string $floor
+     * @param string $door
+     * @param string $apartment
+     * @param string $building
+     * @param string $city
+     * @param string $division
+     * @param string $country
      * @param string  $lat
      * @param string  $lng
      * @param string  $full_address
@@ -184,7 +183,7 @@ class Address extends AbstractService
      *
      * @param int $address
      *
-     * @return \Address\Model\Address\Relational
+     * @return \Address\Model\Address
      */
     public function get($address)
     {

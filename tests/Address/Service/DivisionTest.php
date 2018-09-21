@@ -2,7 +2,6 @@
 
 namespace AddressTest\Service;
 
-use Address\Service\Country;
 use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
 
 class DivisionTest extends AbstractHttpControllerTestCase

@@ -2,7 +2,6 @@
 
 namespace AddressTest\Geoloc;
 
-use Zend\Http\Client;
 use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
 
 class GeolocTest extends AbstractHttpControllerTestCase

@@ -9,7 +9,7 @@ class Address extends AbstractMapper
     /**
      * @param int $address
      *
-     * @return \Dal\Dal\Db\ResultSet
+     * @return \Dal\Db\ResultSet\ResultSet
      */
     public function get($address)
     {
@@ -26,7 +26,7 @@ class Address extends AbstractMapper
     /**
      * @param int $address
      *
-     * @return \Dal\Dal\Db\ResultSet
+     * @return \Dal\Db\ResultSet\ResultSet
      */
     public function selectByArray($address, $city = null, $division = null, $country = null)
     {
@@ -98,7 +98,7 @@ class Address extends AbstractMapper
     /**
      * @param int $address
      *
-     * @return \Dal\Dal\Db\ResultSet
+     * @return \Dal\Db\ResultSet\ResultSet
      */
     public function getList()
     {

@@ -11,7 +11,7 @@ class Division extends AbstractService
      *
      * @param array $filter
      *
-     * @return \Dal\Db\ResultSet
+     * @return \Dal\Db\ResultSet\ResultSet
      */
     public function getList(array $filter = array())
     {
