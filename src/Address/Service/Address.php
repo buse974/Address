@@ -87,7 +87,9 @@ class Address extends AbstractService
             $lng = (!empty($data['longitude'])) ? $data['longitude'] : null;
             $full_address = (!empty($data['full_address'])) ? $data['full_address'] : null;
 
-            $m_address = $this->add($street_no, $street_type, $street_name, $floor, $door, $apartment, $building, $city_id, $division_id, $country_id, $lat, $lng, $full_address);
+            $this->add($street_no, $street_type, $street_name, $floor, $door, $apartment, $building, $city_id, $division_id, $country_id, $lat, $lng, $full_address);
+            
+            $m_address = $this->getMapper()->selectByArray($data, $city_id, $division_id, $country_id)->current();
         }
 
         return $m_address;
@@ -157,9 +159,10 @@ class Address extends AbstractService
             ->setCountryId($country_id)
             ->setFullAddress($full_address);
 
-	if(!$m_address->toArrayCurrent()) {
-	    return null;
-	}
+    	if(!$m_address->toArrayCurrent()) {
+    	    return null;
+    	}
+    	
         $LngLat = ($lat && $lng) ? ['lat' => $lat,'lng' => $lng] : $this->getLngLat($street_no, $street_type, $street_name, $city_name, $division_name, $country_name);
         if (null !== $LngLat) {
             $m_address->setLongitude($LngLat['lng'])->setLatitude($LngLat['lat']);
